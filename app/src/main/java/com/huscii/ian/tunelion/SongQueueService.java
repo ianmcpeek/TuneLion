@@ -15,7 +15,7 @@ public class SongQueueService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        player = MediaPlayer.create(this, R.raw.opossom_girl);
+        player = MediaPlayer.create(this, R.raw.shake_it_off);
         //player.setDataSource(String path); will be used for changing songs
         //player.start();
     }
@@ -53,6 +53,8 @@ public class SongQueueService extends Service {
     public void backSkipSong() {
         player.seekTo(0);
     }
+
+    public void forwardSkipSong() { player.seekTo(player.getDuration());}
 
     public boolean isPlaying() {
         return player.isPlaying();

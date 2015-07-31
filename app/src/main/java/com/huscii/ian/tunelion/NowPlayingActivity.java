@@ -4,10 +4,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
@@ -16,29 +15,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import de.umass.lastfm.Album;
 import de.umass.lastfm.Caller;
-import de.umass.lastfm.ImageSize;
+import de.umass.lastfm.Track;
 
 
 public class NowPlayingActivity extends ActionBarActivity {
     //use boolean to store whether song is playing or not
     //still needs volume control, randomize, repeat, skip
-    Button skipBtn;
+    boolean paused;
     Intent songServiceIntent;
     SongQueueService songService;
-
-    Drawable drwble;
-
-    ImageView albumArt;
+    PlayCountContract.PlayCountDatabaseHelper dbHelper;
+    TextView txt_album;
+    TextView txt_plays;
 
     //MediaPlayer player;
 
@@ -46,12 +38,31 @@ public class NowPlayingActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now_playing);
+        dbHelper = new PlayCountContract.PlayCountDatabaseHelper(getApplicationContext());
+        txt_album = (TextView)this.findViewById(R.id.txt_albumname);
+        txt_plays = (TextView)this.findViewById(R.id.txt_playcount);
+
+        int count =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
+        txt_plays.setText("Play Count = " + count);
+
         songServiceIntent = new Intent(this, SongQueueService.class);
         startService(songServiceIntent);
         bindService(songServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
-        skipBtn = (Button) this.findViewById(R.id.btn_skip);
-        albumArt = (ImageView) this.findViewById(R.id.imageView);
-        //player = MediaPlayer.create(this, R.raw.shake_it_off);
+
+        //check whether connected to internet
+        if(checkForConnection()) {
+            new LastFMTask().execute();
+            Toast.makeText(getApplicationContext(), "Grabbing album name from last.fm", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        //grab album name from last.fm
+        //new LastFMTask().execute();
     }
 
     @Override
@@ -94,12 +105,29 @@ public class NowPlayingActivity extends ActionBarActivity {
         Button b = (Button)v.findViewById(R.id.btn_play);
         if(!songService.isPlaying()) {
             songService.playSong();
-            new LastFMTask().execute();
             b.setText("Pause");
+            paused = false;
+
+            //save play count to database
+            int playCount = 0;
+                    playCount =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
+            if(playCount > 0) {
+                //update
+                PlayCountContract.update("shake_it_off.mp3", playCount, dbHelper);
+            } else {
+                //insert
+                PlayCountContract.insert("shake_it_off.mp3", dbHelper);
+            }
+
+            //TextView txtPlay = (TextView)v.findViewById(R.id.txt_playcnt);
+            txt_plays.setText("Play Count = " + playCount);
         } else {
             songService.pauseSong();
             b.setText("Play");
+            paused = true;
+
         }
+
     }
 
     public void back(View v) {
@@ -108,7 +136,15 @@ public class NowPlayingActivity extends ActionBarActivity {
     }
 
     public void skip(View v) {
-//        new LastFMTask().execute();
+        //btn_skip = (Button)v.findViewById(R.id.btn_skip);
+        songService.forwardSkipSong();
+    }
+
+    public boolean checkForConnection() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
     }
 
     private class LastFMTask extends AsyncTask {
@@ -119,35 +155,15 @@ public class NowPlayingActivity extends ActionBarActivity {
             Caller.getInstance().setUserAgent("tst");
             String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
             String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
-            Album album = Album.getInfo("The Bangles", "Manic Monday", key);
-            String artworkURL = album.getImageURL(ImageSize.LARGESQUARE);
-//            Track track = Track.getInfo("The Bangles", "Manic Monday", key);
+            Track track = Track.getInfo("Taylor Swift", "Shake it Off", key);
             //track.getAlbum();
-//            return track.getAlbum();
-            return artworkURL;
+            return track.getAlbum();
         }
 
         @Override
         protected void onPostExecute(Object result) {
-            try {
-                drwble = drawableFromUrl((String) result);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            albumArt.setImageDrawable(drwble);
+            txt_album.setText((String)result);
         }
     }
 
-    // This needs to be worked a little. Maybe a new method will
-    // do the trick ;)
-    private Drawable drawableFromUrl(String url) throws IOException {
-        Bitmap x;
-
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-        connection.connect();
-        InputStream input = connection.getInputStream();
-
-        x = BitmapFactory.decodeStream(input);
-        return new BitmapDrawable(x);
-    }
 }
