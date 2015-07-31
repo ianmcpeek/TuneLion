@@ -13,7 +13,7 @@
         android:maxWidth="200dp"
         android:hint="@string/email_text"
         android:id="@+id/email_text"
-        android:maxHeight="100dp"
+        android:maxHeight="40dp"
         android:layout_above="@+id/password_text"
         android:layout_centerHorizontal="true" />
     <EditText
@@ -24,7 +24,7 @@
         android:hint="@string/password_text"
         android:id="@+id/password_text"
         android:password="true"
-        android:maxHeight="100dp"
+        android:maxHeight="40dp"
         android:layout_above="@+id/btn_confirm"
         android:layout_centerHorizontal="true" />
 

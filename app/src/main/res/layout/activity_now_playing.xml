@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Play"
-        android:id="@+id/button"
+        android:id="@+id/btn_play"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:onClick="onClick"/>
@@ -22,8 +22,8 @@
         android:id="@+id/btn_back"
         android:onClick="back"
         android:layout_below="@+id/imageView"
-        android:layout_toLeftOf="@+id/button"
-        android:layout_toStartOf="@+id/button" />
+        android:layout_toLeftOf="@+id/btn_play"
+        android:layout_toStartOf="@+id/btn_play" />
 
     <Button
         android:layout_width="wrap_content"
@@ -31,15 +31,16 @@
         android:text="Skip"
         android:id="@+id/btn_skip"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/button"
-        android:layout_toEndOf="@+id/button" />
+        android:layout_toRightOf="@+id/btn_play"
+        android:onClick="skip"
+        android:layout_toEndOf="@+id/btn_play" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
         android:src="@drawable/tunelion_logo"
-        android:layout_above="@+id/button"
+        android:layout_above="@+id/btn_play"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 

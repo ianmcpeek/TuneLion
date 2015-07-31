@@ -4,7 +4,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
@@ -13,17 +12,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
+import de.umass.lastfm.Album;
 import de.umass.lastfm.Caller;
-import de.umass.lastfm.Track;
+import de.umass.lastfm.ImageSize;
 
 
 public class NowPlayingActivity extends ActionBarActivity {
     //use boolean to store whether song is playing or not
     //still needs volume control, randomize, repeat, skip
-    Button btn_skip;
+    Button skipBtn;
     Intent songServiceIntent;
     SongQueueService songService;
+
+    ImageView albumArt;
 
     //MediaPlayer player;
 
@@ -34,7 +37,8 @@ public class NowPlayingActivity extends ActionBarActivity {
         songServiceIntent = new Intent(this, SongQueueService.class);
         startService(songServiceIntent);
         bindService(songServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
-        btn_skip = (Button)this.findViewById(R.id.btn_skip);
+        skipBtn = (Button) this.findViewById(R.id.btn_skip);
+        albumArt = (ImageView) this.findViewById(R.id.imageView);
         //player = MediaPlayer.create(this, R.raw.shake_it_off);
     }
 
@@ -75,9 +79,10 @@ public class NowPlayingActivity extends ActionBarActivity {
     };
 
     public void onClick(View v) {
-        Button b = (Button)v.findViewById(R.id.button);
+        Button b = (Button)v.findViewById(R.id.btn_play);
         if(!songService.isPlaying()) {
             songService.playSong();
+            new LastFMTask().execute();
             b.setText("Pause");
         } else {
             songService.pauseSong();
@@ -91,8 +96,7 @@ public class NowPlayingActivity extends ActionBarActivity {
     }
 
     public void skip(View v) {
-        //btn_skip = (Button)v.findViewById(R.id.btn_skip);
-        new LastFMTask().execute();
+//        new LastFMTask().execute();
     }
 
     private class LastFMTask extends AsyncTask {
@@ -103,17 +107,16 @@ public class NowPlayingActivity extends ActionBarActivity {
             Caller.getInstance().setUserAgent("tst");
             String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
             String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
-            Track track = Track.getInfo("The Bangles", "Manic Monday", key);
+            Album album = Album.getInfo("Opossom", "Electric Hawaii", key);
+            String artworkURL = album.getImageURL(ImageSize.LARGESQUARE);
+//            Track track = Track.getInfo("The Bangles", "Manic Monday", key);
             //track.getAlbum();
-            return track.getAlbum();
+//            return track.getAlbum();
         }
 
         @Override
         protected void onPostExecute(Object result) {
-            btn_skip.setText((String)result);
+            skipBtn.setText((String) result);
         }
     }
-//
-//    // for skip button
-//    new LastFMTask().execute();
 }
