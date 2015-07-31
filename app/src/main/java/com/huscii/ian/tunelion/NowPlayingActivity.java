@@ -4,6 +4,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
@@ -13,6 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import de.umass.lastfm.Album;
 import de.umass.lastfm.Caller;
@@ -25,6 +35,8 @@ public class NowPlayingActivity extends ActionBarActivity {
     Button skipBtn;
     Intent songServiceIntent;
     SongQueueService songService;
+
+    Drawable drwble;
 
     ImageView albumArt;
 
@@ -107,16 +119,35 @@ public class NowPlayingActivity extends ActionBarActivity {
             Caller.getInstance().setUserAgent("tst");
             String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
             String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
-            Album album = Album.getInfo("Opossom", "Electric Hawaii", key);
+            Album album = Album.getInfo("The Bangles", "Manic Monday", key);
             String artworkURL = album.getImageURL(ImageSize.LARGESQUARE);
 //            Track track = Track.getInfo("The Bangles", "Manic Monday", key);
             //track.getAlbum();
 //            return track.getAlbum();
+            return artworkURL;
         }
 
         @Override
         protected void onPostExecute(Object result) {
-            skipBtn.setText((String) result);
+            try {
+                drwble = drawableFromUrl((String) result);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            albumArt.setImageDrawable(drwble);
         }
+    }
+
+    // This needs to be worked a little. Maybe a new method will
+    // do the trick ;)
+    private Drawable drawableFromUrl(String url) throws IOException {
+        Bitmap x;
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.connect();
+        InputStream input = connection.getInputStream();
+
+        x = BitmapFactory.decodeStream(input);
+        return new BitmapDrawable(x);
     }
 }
