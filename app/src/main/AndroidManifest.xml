@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.huscii.ian.tunelion" >
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -23,9 +23,15 @@
             android:name=".NowPlayingActivity"
             android:label="@string/title_activity_now_playing" >
         </activity>
+
         <service
-            android:name="SongQueueService"
-            android:label="Active Song Queue"/>
+            android:name=".SongQueueService"
+            android:label="Active Song Queue" />
+
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login" >
+        </activity>
     </application>
 
 </manifest>

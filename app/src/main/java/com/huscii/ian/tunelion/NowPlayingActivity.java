@@ -82,4 +82,26 @@ public class NowPlayingActivity extends ActionBarActivity {
         //Button b = (Button)v.findViewById(R.id.btn_back);
         songService.backSkipSong();
     }
+
+//    private class LastFMTask extends AsyncTask {
+//
+//        @Override
+//        protected String doInBackground(Object[] params) {
+//            Caller.getInstance().setCache(null);
+//            Caller.getInstance().setUserAgent("tst");
+//            String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
+//            String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
+//            Track track = Track.getInfo("The Bangles", "Manic Monday", key);
+//            //track.getAlbum();
+//            return track.getAlbum();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Object result) {
+//            btn.setText((String)result);
+//        }
+//    }
+//
+//    // for skip button
+//    new LastFMTask().execute();
 }
