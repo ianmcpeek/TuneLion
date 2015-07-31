@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.huscii.ian.tunelion.NowPlaying.NowPlayingActivity;
+import com.huscii.ian.tunelion.NowPlayingActivity;
 import com.huscii.ian.tunelion.R;
 
 import org.json.JSONObject;

@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+
+import com.huscii.ian.tunelion.Login.LoginActivity;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -14,6 +17,24 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Button loginBtn = (Button) findViewById(R.id.login_btn);
+        loginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Button skipLoginBtn = (Button) findViewById(R.id.skip_login_btn);
+        skipLoginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), NowPlayingActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -36,10 +57,5 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void onClick(View v) {
-        Intent intent = new Intent(v.getContext(), NowPlayingActivity.class);
-        startActivity(intent);
     }
 }
