@@ -16,4 +16,8 @@
     <color name="light_blue_color">#8282FF</color>
     <color name="light_red_color">#FF7E7E</color>
     <color name="gold_color">#DEBD5C</color>
+    <string name="title_activity_music_list">MusicListActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_song_list_view_loader">SongListViewLoader</string>
 </resources>

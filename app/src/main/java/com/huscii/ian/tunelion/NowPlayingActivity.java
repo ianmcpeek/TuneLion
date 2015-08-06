@@ -25,12 +25,14 @@ import de.umass.lastfm.Track;
 public class NowPlayingActivity extends ActionBarActivity {
     //use boolean to store whether song is playing or not
     //still needs volume control, randomize, repeat, skip
-    boolean paused;
-    Intent songServiceIntent;
-    SongQueueService songService;
-    PlayCountContract.PlayCountDatabaseHelper dbHelper;
-    TextView txt_album;
-    TextView txt_plays;
+    private boolean paused;
+    private Intent songServiceIntent;
+    private SongQueueService songService;
+    private PlayCountContract.PlayCountDatabaseHelper dbHelper;
+    private TextView txt_album;
+    private TextView txt_plays;
+    private Button btn_play;
+    String song_path;
 
     //MediaPlayer player;
 
@@ -38,12 +40,17 @@ public class NowPlayingActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now_playing);
+        paused = false;
         dbHelper = new PlayCountContract.PlayCountDatabaseHelper(getApplicationContext());
         txt_album = (TextView)this.findViewById(R.id.txt_albumname);
         txt_plays = (TextView)this.findViewById(R.id.txt_playcount);
+        btn_play = (Button)this.findViewById(R.id.btn_play);
 
         int count =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
         txt_plays.setText("Play Count = " + count);
+
+        //pass in path recieved from song item
+        song_path = getIntent().getExtras().getString("song_path");
 
         songServiceIntent = new Intent(this, SongQueueService.class);
         startService(songServiceIntent);
@@ -59,10 +66,11 @@ public class NowPlayingActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        //grab album name from last.fm
-        //new LastFMTask().execute();
+    protected void onResume() {
+        super.onResume();
+        if(paused) {
+            btn_play.setText("Pause");
+        }
     }
 
     @Override
@@ -102,10 +110,10 @@ public class NowPlayingActivity extends ActionBarActivity {
     };
 
     public void onClick(View v) {
-        Button b = (Button)v.findViewById(R.id.btn_play);
+
         if(!songService.isPlaying()) {
-            songService.playSong();
-            b.setText("Pause");
+            songService.playSong(song_path);
+            btn_play.setText("Pause");
             paused = false;
 
             //save play count to database
@@ -123,7 +131,7 @@ public class NowPlayingActivity extends ActionBarActivity {
             txt_plays.setText("Play Count = " + playCount);
         } else {
             songService.pauseSong();
-            b.setText("Play");
+            btn_play.setText("Play");
             paused = true;
 
         }

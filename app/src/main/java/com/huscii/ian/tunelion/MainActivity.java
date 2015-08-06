@@ -47,7 +47,7 @@ public class MainActivity extends ActionBarActivity {
         skipLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), NowPlayingActivity.class);
+                Intent intent = new Intent(v.getContext(), MusicListActivity.class);
                 startActivity(intent);
             }
         });

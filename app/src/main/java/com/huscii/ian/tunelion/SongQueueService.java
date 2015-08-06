@@ -6,6 +6,8 @@ import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 
+import java.io.IOException;
+
 /**
  * Created by ian on 24/07/15.
  */
@@ -42,7 +44,20 @@ public class SongQueueService extends Service {
     }
 
     //trying to commit gradle
-    public void playSong() {
+    public void playSong(String path) {
+        player.reset();
+        try {
+            player.setDataSource(path);
+            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    player.start();
+                }
+            });
+            player.prepareAsync();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         player.start();
     }
 
