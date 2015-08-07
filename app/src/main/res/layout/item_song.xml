@@ -30,7 +30,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="pathing"
-        android:id="@+id/txt_path"
+        android:text="-1"
+        android:id="@+id/txt_index"
         android:visibility="gone" />
+
 </LinearLayout>

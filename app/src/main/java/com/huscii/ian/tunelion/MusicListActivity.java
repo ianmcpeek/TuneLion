@@ -25,12 +25,16 @@ import java.util.concurrent.TimeUnit;
 
 
 public class MusicListActivity extends AppCompatActivity {
-    ArrayList<String> songPathList;
+    private ArrayList<String> songPathList;
+    private int songindex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
+
+        songPathList = new ArrayList<>();
+        songindex = 0;
 
         //retrieve existing music on phone
         String[] projection = {
@@ -86,10 +90,12 @@ public class MusicListActivity extends AppCompatActivity {
     public void onItemClicked(View v) {
         Toast.makeText(getApplicationContext(), "You touched me! ;)", Toast.LENGTH_SHORT).show();
 
-        TextView txtpath = (TextView)v.findViewById(R.id.txt_path);
+        TextView txtIndex = (TextView)v.findViewById(R.id.txt_index);
+        int myIndex = Integer.parseInt(txtIndex.getText().toString());
         //start nowPlaying activity, pass in song path as an extra
         Intent intent = new Intent(v.getContext(), NowPlayingActivity.class);
-        intent.putExtra("song_path", txtpath.getText());
+        intent.putStringArrayListExtra("song_playlist", songPathList);
+        intent.putExtra("song_index", myIndex);
         startActivity(intent);
     }
 
@@ -110,7 +116,7 @@ public class MusicListActivity extends AppCompatActivity {
             TextView txtArtist = (TextView) view.findViewById(R.id.txt_artist);
             TextView txtAlbum = (TextView) view.findViewById(R.id.txt_album);
             TextView txtDuration = (TextView) view.findViewById(R.id.txt_duration);
-            TextView txtPath = (TextView) view.findViewById(R.id.txt_path);
+            TextView txtIndex = (TextView) view.findViewById(R.id.txt_index);
 
             //cursor.getString(0) + " " + cursor.getString(1) + " " + cursor.getString(3) +
             //" " + cursor.getString(4) + " " + cursor.getString(5) + " " + cursor.getString(6)
@@ -120,7 +126,7 @@ public class MusicListActivity extends AppCompatActivity {
             int duration = cursor.getInt(cursor.getColumnIndex("DURATION"));
             //Used to change song
             String dataSource = cursor.getString(3);
-
+            songPathList.add(dataSource);
             txtSong.setText(song);
             txtArtist.setText(artist);
             txtAlbum.setText(song);
@@ -128,7 +134,8 @@ public class MusicListActivity extends AppCompatActivity {
                     TimeUnit.MILLISECONDS.toMinutes(duration),
                     TimeUnit.MILLISECONDS.toSeconds(duration) -
                             TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))));
-            txtPath.setText(dataSource);
+            txtIndex.setText(Integer.toString(songindex));
+            songindex++;
 
         }
 

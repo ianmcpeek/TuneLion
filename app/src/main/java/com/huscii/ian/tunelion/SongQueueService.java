@@ -7,17 +7,24 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by ian on 24/07/15.
  */
 public class SongQueueService extends Service {
     private final IBinder mBinder = new LocalBinder();
-    MediaPlayer player;
+    private MediaPlayer player;
+    private ArrayList<String> songPathQueue;
+    private int currentSongIndex;
+    private boolean songReady;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        songPathQueue = new ArrayList<String>();
         player = MediaPlayer.create(this, R.raw.shake_it_off);
+        songReady = false;
         //player.setDataSource(String path); will be used for changing songs
         //player.start();
     }
@@ -43,22 +50,36 @@ public class SongQueueService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    //trying to commit gradle
-    public void playSong(String path) {
-        player.reset();
-        try {
-            player.setDataSource(path);
-            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    player.start();
-                }
-            });
-            player.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void prepareSongQueue(ArrayList<String> songPathList, int startIndex) {
+        songPathQueue = songPathList;
+        currentSongIndex = startIndex;
+        prepareSong(currentSongIndex);
+    }
+
+    private void prepareSong(int index) {
+        songReady = false;
+        if(index<songPathQueue.size()) {
+            player.reset();
+            try {
+                player.setDataSource(songPathQueue.get(index));
+                player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        songReady = true;
+                    }
+                });
+                player.prepareAsync();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        player.start();
+    }
+
+    //trying to commit gradle
+    public void playSong() {
+       if(songReady) {
+           player.start();
+       }
     }
 
     public void pauseSong() {

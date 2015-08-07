@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import de.umass.lastfm.Caller;
 import de.umass.lastfm.Track;
 
@@ -32,7 +34,9 @@ public class NowPlayingActivity extends ActionBarActivity {
     private TextView txt_album;
     private TextView txt_plays;
     private Button btn_play;
-    String song_path;
+
+    private ArrayList<String> songPath;
+    private int songIndex;
 
     //MediaPlayer player;
 
@@ -49,12 +53,13 @@ public class NowPlayingActivity extends ActionBarActivity {
         int count =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
         txt_plays.setText("Play Count = " + count);
 
-        //pass in path recieved from song item
-        song_path = getIntent().getExtras().getString("song_path");
 
         songServiceIntent = new Intent(this, SongQueueService.class);
         startService(songServiceIntent);
         bindService(songServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
+        //pass in path recieved from song item
+        songPath = getIntent().getStringArrayListExtra("song_playlist");
+        songIndex = getIntent().getIntExtra("song_index", -1);
 
         //check whether connected to internet
         if(checkForConnection()) {
@@ -101,6 +106,7 @@ public class NowPlayingActivity extends ActionBarActivity {
                                        IBinder service) {
             SongQueueService.LocalBinder binder = (SongQueueService.LocalBinder) service;
             songService = binder.getServiceInstance();
+            songService.prepareSongQueue(songPath, songIndex);
         }
 
         @Override
@@ -112,7 +118,7 @@ public class NowPlayingActivity extends ActionBarActivity {
     public void onClick(View v) {
 
         if(!songService.isPlaying()) {
-            songService.playSong(song_path);
+            songService.playSong();
             btn_play.setText("Pause");
             paused = false;
 
