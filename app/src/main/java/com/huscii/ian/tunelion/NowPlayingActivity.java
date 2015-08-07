@@ -4,6 +4,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -15,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +42,14 @@ public class NowPlayingActivity extends ActionBarActivity {
 
     private ArrayList<String> songPath;
     private int songIndex;
+
+    // displaying metadeta
+//    TextView album, artist, genre;
+
+    // displaying album art
+    ImageView album_art;
+    MediaMetadataRetriever metaRetriver;
+    byte[] art;
 
     //MediaPlayer player;
 
@@ -67,6 +80,23 @@ public class NowPlayingActivity extends ActionBarActivity {
             Toast.makeText(getApplicationContext(), "Grabbing album name from last.fm", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
+        }
+
+        // retrieve album art from song
+        album_art = (ImageView) findViewById(R.id.album_art);
+        metaRetriver = new MediaMetadataRetriever();
+        metaRetriver.setDataSource(songPath.get(songIndex));
+        try {
+            art = metaRetriver.getEmbeddedPicture();
+            Bitmap songImage = BitmapFactory.decodeByteArray(art, 0, art.length);
+            album_art.setImageBitmap(songImage);
+//            album.setText(metaRetriver .extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
+//            artist.setText(metaRetriver .extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+//            genre.setText(metaRetriver .extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE));
+        } catch (Exception e) {
+//            album.setText("Unknown Album");
+//            artist.setText("Unknown Artist");
+//            genre.setText("Unknown Genre");
         }
     }
 

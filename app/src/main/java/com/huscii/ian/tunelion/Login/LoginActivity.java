@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.huscii.ian.tunelion.MusicListActivity;
 import com.huscii.ian.tunelion.NowPlayingActivity;
 import com.huscii.ian.tunelion.R;
 
@@ -27,7 +28,9 @@ import java.net.URL;
 
 public class LoginActivity extends ActionBarActivity {
 
-    private static final String TAG = "LoginActivity" ;
+    private static final String TAG = "LoginActivity";
+
+    private boolean loggedIn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,13 +64,14 @@ public class LoginActivity extends ActionBarActivity {
                 String email = emailText.getText().toString();
                 String pwd = pwdText.getText().toString();
                 if (email.length() != 0 && pwd.length() != 0) {
-                    Intent intent = new Intent(v.getContext(), NowPlayingActivity.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Please enter e-mail and/or password",
-                            Toast.LENGTH_SHORT)
-                            .show();
+                    String url = "http://cssgate.insttech.washington.edu/~jalecomp/TuneLion/newUsers.php?email=";
+                    url += email + "&password=" + pwd;
+                    Log.d(TAG, url);
+                    new ConfirmUserWebTask().execute(url);
+                    if (loggedIn) {
+                        Intent intent = new Intent(v.getContext(), MusicListActivity.class);
+                        startActivity(intent);
+                    }
                 }
             }
         });
@@ -93,6 +97,94 @@ public class LoginActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class ConfirmUserWebTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                return downloadUrl(urls[0]);
+            } catch (IOException e) {
+                return "Unable to retrieve web page. URL may be invalid.";
+            }
+        }
+
+        // Given a URL, establishes an HttpUrlConnection and retrieves
+        // the web page content as a InputStream, which it returns as
+        // a string.
+        private String downloadUrl(String myurl) throws IOException {
+            InputStream is = null;
+            // Only display the first 500 characters of the retrieved
+            // web page content.
+            int len = 500;
+
+            try {
+                URL url = new URL(myurl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(10000 /* milliseconds */);
+                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setRequestMethod("GET");
+                conn.setDoInput(true);
+                // Starts the query
+                conn.connect();
+                int response = conn.getResponseCode();
+                Log.d(TAG, "The response is: " + response);
+                is = conn.getInputStream();
+
+                // Convert the InputStream into a string
+                String contentAsString = readIt(is, len);
+                Log.d(TAG, "The string is: " + contentAsString);
+                return contentAsString;
+
+                // Makes sure that the InputStream is closed after the app is
+                // finished using it.
+            } catch (Exception e) {
+                Log.d(TAG, "Something happened" + e.getMessage());
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+            return null;
+        }
+
+        // Reads an InputStream and converts it to a String.
+        public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+            Reader reader = null;
+            reader = new InputStreamReader(stream, "UTF-8");
+            char[] buffer = new char[len];
+            reader.read(buffer);
+            return new String(buffer);
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            // Parse JSON
+            try {
+                JSONObject jsonObject = new JSONObject(s);
+                String status = jsonObject.getString("result");
+                if (status.equalsIgnoreCase("success")) {
+                    loggedIn = true;
+                    Toast.makeText(LoginActivity.this, "Logged in! :D",
+                            Toast.LENGTH_SHORT)
+                            .show();
+                    getFragmentManager().popBackStackImmediate();
+                } else {
+                    loggedIn = true;
+                    String reason = jsonObject.getString("error");
+                    Toast.makeText(LoginActivity.this, "Failed: " + reason,
+                            Toast.LENGTH_SHORT)
+                            .show();
+                }
+            }
+            catch(Exception e) {
+                Log.d(TAG, "Parsing JSON Exception " +
+                        e.getMessage());
+            }
+        }
     }
 
     private class AddUserWebTask extends AsyncTask<String, Void, String> {
@@ -169,7 +261,7 @@ public class LoginActivity extends ActionBarActivity {
                     getFragmentManager().popBackStackImmediate();
                 } else {
                     String reason = jsonObject.getString("error");
-                    Toast.makeText(LoginActivity.this, "Failed :" + reason,
+                    Toast.makeText(LoginActivity.this, "Failed: " + reason,
                             Toast.LENGTH_SHORT)
                             .show();
                 }
