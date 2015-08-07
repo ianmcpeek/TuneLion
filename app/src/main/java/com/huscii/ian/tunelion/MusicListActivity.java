@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MusicListActivity extends AppCompatActivity {
     private ArrayList<String> songPathList;
-    private int songindex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,6 @@ public class MusicListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_music_list);
 
         songPathList = new ArrayList<>();
-        songindex = 0;
 
         //retrieve existing music on phone
         String[] projection = {
@@ -58,6 +57,18 @@ public class MusicListActivity extends AppCompatActivity {
         ListView lv = (ListView) findViewById(R.id.list_view);
         SongCursorAdapter adapter = new SongCursorAdapter(this, cursor, 0);
         lv.setAdapter(adapter);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                Toast.makeText(getApplicationContext(), "You touched me! ;)", Toast.LENGTH_SHORT).show();
+
+                //start nowPlaying activity, pass in song path as an extra
+                Intent intent = new Intent(v.getContext(), NowPlayingActivity.class);
+                intent.putStringArrayListExtra("song_playlist", songPathList);
+                intent.putExtra("song_index", position);
+                startActivity(intent);
+            }
+        });
 
         //Used to change contents within list bro
         //adapter.changeCursor(newCursor);
@@ -87,18 +98,6 @@ public class MusicListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onItemClicked(View v) {
-        Toast.makeText(getApplicationContext(), "You touched me! ;)", Toast.LENGTH_SHORT).show();
-
-        TextView txtIndex = (TextView)v.findViewById(R.id.txt_index);
-        int myIndex = Integer.parseInt(txtIndex.getText().toString());
-        //start nowPlaying activity, pass in song path as an extra
-        Intent intent = new Intent(v.getContext(), NowPlayingActivity.class);
-        intent.putStringArrayListExtra("song_playlist", songPathList);
-        intent.putExtra("song_index", myIndex);
-        startActivity(intent);
-    }
-
     public class SongCursorAdapter extends CursorAdapter {
 
         public SongCursorAdapter(Context context, Cursor c, int flags) {
@@ -116,7 +115,7 @@ public class MusicListActivity extends AppCompatActivity {
             TextView txtArtist = (TextView) view.findViewById(R.id.txt_artist);
             TextView txtAlbum = (TextView) view.findViewById(R.id.txt_album);
             TextView txtDuration = (TextView) view.findViewById(R.id.txt_duration);
-            TextView txtIndex = (TextView) view.findViewById(R.id.txt_index);
+            TextView txtPath = (TextView) view.findViewById(R.id.txt_path);
 
             //cursor.getString(0) + " " + cursor.getString(1) + " " + cursor.getString(3) +
             //" " + cursor.getString(4) + " " + cursor.getString(5) + " " + cursor.getString(6)
@@ -126,7 +125,10 @@ public class MusicListActivity extends AppCompatActivity {
             int duration = cursor.getInt(cursor.getColumnIndex("DURATION"));
             //Used to change song
             String dataSource = cursor.getString(3);
-            songPathList.add(dataSource);
+            if(!songPathList.contains(dataSource)) {
+                songPathList.add(dataSource);
+            }
+            Log.d("SongPathQueue", "Added song " + song);
             txtSong.setText(song);
             txtArtist.setText(artist);
             txtAlbum.setText(song);
@@ -134,8 +136,7 @@ public class MusicListActivity extends AppCompatActivity {
                     TimeUnit.MILLISECONDS.toMinutes(duration),
                     TimeUnit.MILLISECONDS.toSeconds(duration) -
                             TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))));
-            txtIndex.setText(Integer.toString(songindex));
-            songindex++;
+            txtPath.setText(dataSource);
 
         }
 

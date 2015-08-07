@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,8 +26,17 @@ public class SongQueueService extends Service {
         songPathQueue = new ArrayList<String>();
         player = MediaPlayer.create(this, R.raw.shake_it_off);
         songReady = false;
-        //player.setDataSource(String path); will be used for changing songs
-        //player.start();
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                if(prepareSong(++currentSongIndex)) {
+                    Log.d("OnCompletion", "current song index " + currentSongIndex + " out of " + songPathQueue.size());
+                        player.start();
+                        //player.release();
+
+                }
+            }
+        });
     }
 
     @Override
@@ -56,7 +66,7 @@ public class SongQueueService extends Service {
         prepareSong(currentSongIndex);
     }
 
-    private void prepareSong(int index) {
+    private boolean prepareSong(int index) {
         songReady = false;
         if(index<songPathQueue.size()) {
             player.reset();
@@ -68,17 +78,20 @@ public class SongQueueService extends Service {
                         songReady = true;
                     }
                 });
-                player.prepareAsync();
+                player.prepare();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return true;
         }
+        return false;
     }
 
     //trying to commit gradle
     public void playSong() {
        if(songReady) {
            player.start();
+           player.setLooping(true);
        }
     }
 
