@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,17 +20,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 
-public class MusicListActivity extends ActionBarActivity {
+public class MusicListActivity extends AppCompatActivity {
+    ArrayList<String> songPathList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
-
-        TextView view = (TextView) findViewById(R.id.txt_view);
 
         //retrieve existing music on phone
         String[] projection = {
@@ -56,15 +57,7 @@ public class MusicListActivity extends ActionBarActivity {
 
         //Used to change contents within list bro
         //adapter.changeCursor(newCursor);
-//        cursor.moveToFirst();
-//        if(cursor.isAfterLast() == false) {
-//            view.setText("");
-//        }
-//        while(cursor.isAfterLast() == false) {
-//            view.append(cursor.getString(0) + " " + cursor.getString(1) + " " + cursor.getString(3) +
-//                    " " + cursor.getString(4) + " " + cursor.getString(5) + " " + cursor.getString(6) +"\n");
-//            cursor.moveToNext();
-//        }
+
         //cursor.close();
     }
 

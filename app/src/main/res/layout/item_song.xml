@@ -32,5 +32,5 @@
         android:layout_height="wrap_content"
         android:text="pathing"
         android:id="@+id/txt_path"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 </LinearLayout>
