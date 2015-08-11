@@ -20,4 +20,9 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_song_list_view_loader">SongListViewLoader</string>
+    <string name="play_text">Play</string>
+    <string name="back_text">Back</string>
+    <string name="skip_text">Skip</string>
+    <string name="loading_album_text">Loading Album Name...</string>
+    <string name="cancel_text">Cancel</string>
 </resources>

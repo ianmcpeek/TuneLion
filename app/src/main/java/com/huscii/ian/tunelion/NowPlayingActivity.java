@@ -44,7 +44,7 @@ public class NowPlayingActivity extends ActionBarActivity {
     private ArrayList<String> songPath;
     private int songIndex;
 
-    // displaying metadeta
+    // displaying metadata
 //    TextView album, artist, genre;
 
     // displaying album art

@@ -1,72 +1,73 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.huscii.ian.tunelion.NowPlayingActivity">
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Play"
-        android:id="@+id/btn_play"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="onClick"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back"
-        android:id="@+id/btn_back"
-        android:onClick="back"
-        android:layout_below="@+id/album_art"
-        android:layout_toLeftOf="@id/btn_play"
-        android:layout_toStartOf="@id/btn_play" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Skip"
-        android:id="@+id/btn_skip"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@id/btn_play"
-        android:onClick="skip"
-        android:layout_toEndOf="@id/btn_play" />
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            tools:context="com.huscii.ian.tunelion.NowPlayingActivity">
 
     <ImageView
-        android:layout_width="500dp"
-        android:layout_height="500dp"
-        android:id="@id/album_art"
+        android:id="@+id/album_art"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/tunelion_logo"
-        android:layout_above="@+id/btn_play"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="35dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/txt_playcount"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Loading Album Name..."
-        android:id="@+id/txt_albumname"
-        android:layout_alignParentTop="true"
-        android:layout_alignRight="@id/album_art"
-        android:layout_alignEnd="@id/album_art" />
+        android:layout_above="@+id/seek_bar"
+        android:layout_below="@+id/txt_playcount"/>
 
     <SeekBar
+        android:id="@+id/seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/seekBar"
         android:layout_above="@+id/btn_play"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/btn_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        android:text="@string/play_text"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="back"
+        android:text="@string/back_text"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/btn_play"
+        android:layout_toStartOf="@+id/btn_play"/>
+
+    <Button
+        android:id="@+id/btn_skip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="skip"
+        android:text="@string/skip_text"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/btn_play"
+        android:layout_toEndOf="@+id/btn_play"/>
+
+    <TextView
+        android:id="@+id/txt_playcount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/btn_back"
+        android:layout_alignStart="@+id/btn_back"/>
+
+    <TextView
+        android:id="@+id/txt_albumname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/loading_album_text"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/album_art"
+        android:layout_alignEnd="@+id/album_art"/>
 
 </RelativeLayout>
