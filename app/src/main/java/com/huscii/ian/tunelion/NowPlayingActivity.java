@@ -101,7 +101,7 @@ public class NowPlayingActivity extends ActionBarActivity {
             mAlbumArt.setImageResource(R.drawable.tunelion_logo);
             mAlbumName.setText("Unknown Album");
             mArtistName.setText("Unknown Artist");
-            mTitleName.setText("Unknown Artist");
+            mTitleName.setText("Unknown Title");
 //            mGenreName.setText("Unknown Genre");
         }
         // ------- End of retrieving metadata -------
