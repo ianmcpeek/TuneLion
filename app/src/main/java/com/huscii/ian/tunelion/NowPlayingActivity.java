@@ -7,27 +7,19 @@ import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-
-import de.umass.lastfm.Caller;
-import de.umass.lastfm.Track;
 
 
 public class NowPlayingActivity extends ActionBarActivity {
@@ -37,9 +29,12 @@ public class NowPlayingActivity extends ActionBarActivity {
     private Intent songServiceIntent;
     private SongQueueService songService;
     private PlayCountContract.PlayCountDatabaseHelper dbHelper;
-    private TextView txt_album;
-    private TextView txt_plays;
-    private Button btn_play;
+    private TextView mAlbumName;
+    private TextView mPlayCount;
+    private ImageView mPlayButton;
+    private TextView mArtistName;
+    private TextView mGenreName;
+    private TextView mTitleName;
 
     private ArrayList<String> songPath;
     private int songIndex;
@@ -48,7 +43,7 @@ public class NowPlayingActivity extends ActionBarActivity {
 //    TextView album, artist, genre;
 
     // displaying album art
-    ImageView album_art;
+    ImageView mAlbumArt;
     MediaMetadataRetriever metaRetriver;
     byte[] art;
 
@@ -62,13 +57,18 @@ public class NowPlayingActivity extends ActionBarActivity {
 
         paused = false;
         dbHelper = new PlayCountContract.PlayCountDatabaseHelper(getApplicationContext());
-        txt_album = (TextView)this.findViewById(R.id.txt_albumname);
-        txt_plays = (TextView)this.findViewById(R.id.txt_playcount);
-        btn_play = (Button)this.findViewById(R.id.btn_play);
+
+        // ------- Grab widgets from layout -------
+        mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
+        mPlayCount = (TextView) this.findViewById(R.id.playCountText);
+        mPlayButton = (ImageView)  this.findViewById(R.id.playButton);
+        mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
+        mArtistName = (TextView) this.findViewById(R.id.artistNameText);
+        mTitleName = (TextView) this.findViewById(R.id.titleNameText);
+        // ------- End of grabbing widgets -------
 
         int count =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
-        txt_plays.setText("Play Count = " + count);
-
+        mPlayCount.setText("Play Count: " + count);
 
         songServiceIntent = new Intent(this, SongQueueService.class);
         startService(songServiceIntent);
@@ -78,36 +78,40 @@ public class NowPlayingActivity extends ActionBarActivity {
         songIndex = getIntent().getIntExtra("song_index", -1);
 
         //check whether connected to internet
-        if(checkForConnection()) {
-            new LastFMTask().execute();
-            Toast.makeText(getApplicationContext(), "Grabbing album name from last.fm", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
-        }
+//        if(checkForConnection()) {
+//            new LastFMTask().execute();
+//            Toast.makeText(getApplicationContext(), "Grabbing album name from last.fm", Toast.LENGTH_SHORT).show();
+//        } else {
+//            Toast.makeText(getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
+//        }
 
-        // retrieve album art from song
-        album_art = (ImageView) findViewById(R.id.album_art);
+        // ------- Retrieve metadata from song -------
+        mAlbumArt = (ImageView) findViewById(R.id.albumArt);
         metaRetriver = new MediaMetadataRetriever();
         metaRetriver.setDataSource(songPath.get(songIndex));
         try {
             art = metaRetriver.getEmbeddedPicture();
             Bitmap songImage = BitmapFactory.decodeByteArray(art, 0, art.length);
-            album_art.setImageBitmap(songImage);
-//            album.setText(metaRetriver .extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
-//            artist.setText(metaRetriver .extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-//            genre.setText(metaRetriver .extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE));
+            mAlbumArt.setImageBitmap(songImage);
+            mAlbumName.setText(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
+            mArtistName.setText(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+            mTitleName.setText(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+//            mGenreName.setText(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE));
         } catch (Exception e) {
-//            album.setText("Unknown Album");
-//            artist.setText("Unknown Artist");
-//            genre.setText("Unknown Genre");
+            mAlbumArt.setImageResource(R.drawable.tunelion_logo);
+            mAlbumName.setText("Unknown Album");
+            mArtistName.setText("Unknown Artist");
+            mTitleName.setText("Unknown Artist");
+//            mGenreName.setText("Unknown Genre");
         }
+        // ------- End of retrieving metadata -------
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if(paused) {
-            btn_play.setText("Pause");
+            mPlayButton.setImageResource(R.drawable.play_button);
         }
     }
 
@@ -152,7 +156,7 @@ public class NowPlayingActivity extends ActionBarActivity {
 
         if(!songService.isPlaying()) {
             songService.playSong();
-            btn_play.setText("Pause");
+            mPlayButton.setImageResource(R.drawable.pause_button);
             paused = false;
 
             //save play count to database
@@ -167,10 +171,10 @@ public class NowPlayingActivity extends ActionBarActivity {
             }
 
             //TextView txtPlay = (TextView)v.findViewById(R.id.txt_playcnt);
-            txt_plays.setText("Play Count = " + playCount);
+            this.mPlayCount.setText("Play Count: " + playCount);
         } else {
             songService.pauseSong();
-            btn_play.setText("Play");
+            mPlayButton.setImageResource(R.drawable.play_button);
             paused = true;
 
         }
@@ -194,23 +198,22 @@ public class NowPlayingActivity extends ActionBarActivity {
         return activeNetworkInfo != null;
     }
 
-    private class LastFMTask extends AsyncTask {
-
-        @Override
-        protected String doInBackground(Object[] params) {
-            Caller.getInstance().setCache(null);
-            Caller.getInstance().setUserAgent("tst");
-            String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
-            String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
-            Track track = Track.getInfo("Taylor Swift", "Shake it Off", key);
-            //track.getAlbum();
-            return track.getAlbum();
-        }
-
-        @Override
-        protected void onPostExecute(Object result) {
-            txt_album.setText((String)result);
-        }
-    }
-
+//    private class LastFMTask extends AsyncTask {
+//
+//        @Override
+//        protected String doInBackground(Object[] params) {
+//            Caller.getInstance().setCache(null);
+//            Caller.getInstance().setUserAgent("tst");
+//            String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
+//            String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
+//            Track track = Track.getInfo("Taylor Swift", "Shake it Off", key);
+//            //track.getAlbum();
+//            return track.getAlbum();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Object result) {
+//            mAlbumName.setText((String)result);
+//        }
+//    }
 }

@@ -45,8 +45,8 @@ public class LoginDialogFragment extends DialogFragment {
         final View view = inflater.inflate(R.layout.dialog_login, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        final EditText emailText = (EditText) view.findViewById(R.id.email_text);
-        final EditText pwdText = (EditText) view.findViewById(R.id.password_text);
+        final EditText emailText = (EditText) view.findViewById(R.id.emailText);
+        final EditText pwdText = (EditText) view.findViewById(R.id.passwordText);
 
         builder.setView(view)
                 // Confirm

@@ -6,17 +6,16 @@
                 tools:context=".MainActivity">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:scaleType="center"
         android:id="@+id/imgBackground"/>
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="300dp"
         android:id="@+id/tunelionLogo"
-        android:src="@drawable/tunelion_logo"
-        android:layout_above="@+id/loginButton"/>
+        android:src="@drawable/tunelion_logo"/>
 
     <TextView
         android:id="@+id/loginButton"
@@ -25,9 +24,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/login_text"
-        android:clickable="true"
-        android:layout_above="@+id/skipLoginButton"
-        android:layout_centerHorizontal="true"/>
+        android:layout_below="@+id/tunelionLogo"
+        android:layout_centerInParent="true"
+        android:clickable="true"/>
 
     <TextView
         android:id="@+id/skipLoginButton"
@@ -37,10 +36,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/skip_login_text"
+        android:layout_below="@+id/loginButton"
+        android:layout_centerInParent="true"
         android:clickable="true"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="142dp"/>
+        android:layout_marginTop="5dp"/>
 
     <!--<RadioGroup-->
         <!--android:id="@+id/radioGroup"-->

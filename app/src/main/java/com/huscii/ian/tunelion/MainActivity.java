@@ -58,7 +58,7 @@ public class MainActivity extends ActionBarActivity {
 //        String bgColor = settings.getString("color","gold");
 //        setBackgroundColor(bgColor);
 
-        TextView loginButton = (TextView) findViewById(R.id.loginButton);
+        TextView loginButton = (TextView) this.findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,7 +68,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        TextView skipLoginButton = (TextView) findViewById(R.id.skipLoginButton);
+        TextView skipLoginButton = (TextView) this.findViewById(R.id.skipLoginButton);
         skipLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,7 +77,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        imgBus = (ImageView) findViewById(R.id.imgBackground);
+        imgBus = (ImageView) this.findViewById(R.id.imgBackground);
 
         imgBus.setBackgroundResource(backgroundImgList.get(backgroundImgId));
         // USED FOR SWAPPING IMAGES (SLIDESHOW) see above
