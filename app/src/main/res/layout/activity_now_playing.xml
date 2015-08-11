@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginTop="32dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="5dp"
         android:paddingRight="3dp"
         android:layout_toRightOf="@+id/artistNameText"
         android:textColor="@color/white"
@@ -79,7 +79,7 @@
         android:id="@+id/seekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="5dp"
         android:layout_above="@+id/playButton"
         android:layout_centerHorizontal="true"/>
 
