@@ -6,9 +6,16 @@
             tools:context="com.huscii.ian.tunelion.NowPlayingActivity">
 
     <ImageView
-        android:id="@+id/songMetadata"
+        android:id="@+id/songMetadataBackground"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:background="@color/mint_green"/>
+
+    <ImageView
+        android:id="@+id/buttonBackground"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_height="75dp"
         android:background="@color/mint_green"/>
 
     <TextView
@@ -63,14 +70,16 @@
         android:id="@+id/albumArt"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scaleType="center"
         android:src="@drawable/tunelion_logo"
         android:layout_above="@+id/seekBar"
-        android:layout_below="@+id/songMetadata"/>
+        android:layout_below="@+id/songMetadataBackground"/>
 
     <SeekBar
         android:id="@+id/seekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:layout_above="@+id/playButton"
         android:layout_centerHorizontal="true"/>
 
@@ -86,11 +95,47 @@
         android:layout_centerHorizontal="true"/>
 
     <ImageView
+        android:id="@+id/repeatOffButton"
+        android:src="@drawable/repeat_off_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginBottom="5dp"
+        android:onClick="back"
+        android:text="@string/back_text"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"/>
+
+    <ImageView
+        android:id="@+id/repeatOneButton"
+        android:src="@drawable/repeat_off_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginBottom="5dp"
+        android:onClick="back"
+        android:text="@string/back_text"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"/>
+
+    <ImageView
+        android:id="@+id/repeatAllButton"
+        android:src="@drawable/repeat_off_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginBottom="5dp"
+        android:onClick="back"
+        android:text="@string/back_text"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"/>
+
+    <ImageView
         android:id="@+id/previousButton"
         android:src="@drawable/previous_button"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginRight="15dp"
         android:layout_marginBottom="5dp"
         android:onClick="back"
         android:text="@string/back_text"
@@ -103,7 +148,7 @@
         android:src="@drawable/next_button"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="15dp"
         android:layout_marginBottom="5dp"
         android:onClick="skip"
         android:text="@string/skip_text"
