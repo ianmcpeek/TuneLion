@@ -16,23 +16,32 @@ import java.util.ArrayList;
 public class SongQueueService extends Service {
     private final IBinder mBinder = new LocalBinder();
     private MediaPlayer player;
+
+    //manage song queue
     private ArrayList<String> songPathQueue;
     private int currentSongIndex;
+
+    //controls for song player
     private boolean songReady;
+    private boolean isBack;
+    private boolean isShuffle;
+    private boolean loopSong;
+    private boolean loopPlaylist;
 
     @Override
     public void onCreate() {
         super.onCreate();
         songPathQueue = new ArrayList<String>();
+        //work around to creating media player
         player = MediaPlayer.create(this, R.raw.shake_it_off);
         songReady = false;
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                if(prepareSong(++currentSongIndex)) {
+                if (nextSong()) {
                     Log.d("OnCompletion", "current song index " + currentSongIndex + " out of " + songPathQueue.size());
-                        player.start();
-                        //player.release();
+                    player.start();
+                    //player.release();
 
                 }
             }
@@ -66,9 +75,44 @@ public class SongQueueService extends Service {
         prepareSong(currentSongIndex);
     }
 
+    private boolean nextSong() {
+       boolean playlistOver = false;
+        if(loopSong) {
+            //do nothing, index is the same
+            currentSongIndex = currentSongIndex;
+        //check if called by previous
+        } else if(isBack) {
+            isBack = false;
+            if(currentSongIndex-1 < 0) {
+                currentSongIndex = songPathQueue.size()-1;
+                if(!loopPlaylist) {
+                    playlistOver = true;
+                }
+            } else {
+                currentSongIndex--;
+            }
+        //check for shuffle
+        } else if (isShuffle) {
+            currentSongIndex = (int)(Math.random() * songPathQueue.size());
+        } else {
+            if(currentSongIndex+1 >= songPathQueue.size()) {
+                currentSongIndex = 0;
+                if(loopPlaylist) {
+                    playlistOver = true;
+                }
+            } else {
+                currentSongIndex++;
+            }
+        }
+        if(playlistOver) {
+            return false;
+        }
+        prepareSong(currentSongIndex);
+        return true;
+    }
+
     private boolean prepareSong(int index) {
         songReady = false;
-        if(index<songPathQueue.size()) {
             player.reset();
             try {
                 player.setDataSource(songPathQueue.get(index));
@@ -81,17 +125,16 @@ public class SongQueueService extends Service {
                 player.prepare();
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
-            return true;
-        }
-        return false;
+        return true;
     }
 
     //trying to commit gradle
     public void playSong() {
        if(songReady) {
            player.start();
-           player.setLooping(true);
+           //player.setLooping(true);
        }
     }
 
@@ -100,12 +143,40 @@ public class SongQueueService extends Service {
     }
 
     public void backSkipSong() {
-        player.seekTo(0);
+        if(player.getDuration()>3000) {
+            player.seekTo(0);
+        } else {
+            //previous song
+            isBack = true;
+            nextSong();
+        }
     }
 
     public void forwardSkipSong() { player.seekTo(player.getDuration());}
 
     public boolean isPlaying() {
         return player.isPlaying();
+    }
+
+    public boolean toggleShuffle() {
+        if(isShuffle) {
+            isShuffle = false;
+        } else {
+            isShuffle = true;
+        }
+        return isShuffle;
+    }
+
+    public int toggleRepeat() {
+        if(!loopSong && !loopPlaylist) {
+            loopPlaylist = true;
+            return 1;
+        } else if(loopPlaylist) {
+            loopPlaylist = false;
+            loopSong = true;
+            return 2;
+        } else {
+            return 3;
+        }
     }
 }
