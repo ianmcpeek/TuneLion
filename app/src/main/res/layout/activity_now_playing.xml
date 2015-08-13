@@ -156,4 +156,11 @@
         android:layout_toRightOf="@+id/playButton"
         android:layout_toEndOf="@+id/playButton"/>
 
+    <MediaController
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mediaController"
+        android:layout_above="@+id/seekBar"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

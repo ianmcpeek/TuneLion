@@ -12,19 +12,21 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 
-public class NowPlayingActivity extends ActionBarActivity {
+public class NowPlayingActivity extends AppCompatActivity implements MediaController.MediaPlayerControl {
     //use boolean to store whether song is playing or not
     //still needs volume control, randomize, repeat, skip
     private boolean paused;
@@ -39,6 +41,7 @@ public class NowPlayingActivity extends ActionBarActivity {
     private TextView mTitleName;
     private SeekBar seekBar;
     private Handler seekHandler;
+    private MediaController mediaController;
 
     private ArrayList<String> songPath;
     private int songIndex;
@@ -71,6 +74,9 @@ public class NowPlayingActivity extends ActionBarActivity {
         mTitleName = (TextView) this.findViewById(R.id.titleNameText);
         seekBar = (SeekBar) this.findViewById(R.id.seekBar);
         seekHandler = new Handler();
+        mediaController = new MediaController(this);
+        mediaController.setMediaPlayer(NowPlayingActivity.this);
+        mediaController.setAnchorView(findViewById(R.id.songMetadataBackground));
         // ------- End of grabbing widgets -------
 
         int count =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
@@ -152,6 +158,7 @@ public class NowPlayingActivity extends ActionBarActivity {
             songService = binder.getServiceInstance();
             songService.prepareSongQueue(songPath, songIndex);
             seekBar.setMax(songService.getDuration());
+            mediaController.show();
             updateSeekProgress();
             //make sure connection is established before wiring up seekbar
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -231,7 +238,68 @@ public class NowPlayingActivity extends ActionBarActivity {
         return activeNetworkInfo != null;
     }
 
-//    private class LastFMTask extends AsyncTask {
+    @Override
+    public void start() {
+        songService.playSong();
+    }
+
+    @Override
+    public void pause() {
+        songService.pauseSong();
+    }
+
+    @Override
+    public int getDuration() {
+        return 0;
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        return 0;
+    }
+
+    @Override
+    public void seekTo(int pos) {
+        songService.seekTo(pos);
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return songService.isPlaying();
+    }
+
+    @Override
+    public int getBufferPercentage() {
+        return 0;
+    }
+
+    @Override
+    public boolean canPause() {
+        return false;
+    }
+
+    @Override
+    public boolean canSeekBackward() {
+        return false;
+    }
+
+    @Override
+    public boolean canSeekForward() {
+        return false;
+    }
+
+    @Override
+    public int getAudioSessionId() {
+        return 0;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        mediaController.show();
+        return false;
+    }
+
+    //    private class LastFMTask extends AsyncTask {
 //
 //        @Override
 //        protected String doInBackground(Object[] params) {

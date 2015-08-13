@@ -2,39 +2,39 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Jef\AndroidStudioProjects\TuneLion\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.2.0\jars\classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
-        <dex dex="C:\Users\Jef\AndroidStudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\classes-fc859890dfa62ecfbd4551613e92b9eabc8f45f9.jar" />
-    </item>
-    <item
-        jar="C:\Users\Jef\AndroidStudioProjects\TuneLion\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
-        <dex dex="C:\Users\Jef\AndroidStudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\classes-bda2fbb7d6c0f7848eb9213cf780a789fbf0478e.jar" />
-    </item>
-    <item
-        jar="C:\Users\Jef\AndroidStudioProjects\TuneLion\app\libs\lastfm-java-0.1.2.jar"
+        jar="C:\Users\Ian\AndroidStudioProjects\TuneLion\app\libs\lastfm-java-0.1.2.jar"
         jumboMode="false"
         revision="22.0.1"
         sha1="b1d6f0040f614b09bebfde1cf346ab4a6ffff81d">
-        <dex dex="C:\Users\Jef\AndroidStudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\lastfm-java-0.1.2-b108c40defa722e458a8a92183ac424fd080ae1c.jar" />
+        <dex dex="C:\Users\Ian\AndroidStudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\lastfm-java-0.1.2-cb249a8d531ff73affecb0af4bd2fbb037bd36b6.jar" />
     </item>
     <item
-        jar="C:\Users\Jef\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\22.2.0\support-annotations-22.2.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
-        <dex dex="C:\Users\Jef\AndroidStudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\support-annotations-22.2.0-40adb3e318785c5f92c0bdce79abb432994467c4.jar" />
-    </item>
-    <item
-        jar="C:\Users\Jef\AndroidStudioProjects\TuneLion\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\libs\internal_impl-22.2.0.jar"
+        jar="C:\Users\Ian\AndroidStudioProjects\TuneLion\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\libs\internal_impl-22.2.0.jar"
         jumboMode="false"
         revision="22.0.1"
         sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
-        <dex dex="C:\Users\Jef\AndroidStudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\internal_impl-22.2.0-f052df3fa94c1ed352c9feabf1632b3e19bb2604.jar" />
+        <dex dex="C:\Users\Ian\AndroidStudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\internal_impl-22.2.0-4d802feb13dada3499b93e076351d1c134b39d1b.jar" />
+    </item>
+    <item
+        jar="C:\Users\Ian\AndroidStudioProjects\TuneLion\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
+        <dex dex="C:\Users\Ian\AndroidStudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\classes-36b21bb595c6ba3d6fc9358ba3b3981263f5cc9f.jar" />
+    </item>
+    <item
+        jar="C:\Users\Ian\AndroidStudioProjects\TuneLion\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
+        <dex dex="C:\Users\Ian\AndroidStudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\classes-39cfcf92c6fa293dc6b3c76d5e52acc36a92d93a.jar" />
+    </item>
+    <item
+        jar="C:\Users\Ian\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\22.2.0\support-annotations-22.2.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
+        <dex dex="C:\Users\Ian\AndroidStudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\support-annotations-22.2.0-8f8318f155cdf273ecf0ef5af88b4b22ef1a6c87.jar" />
     </item>
 
 </items>
