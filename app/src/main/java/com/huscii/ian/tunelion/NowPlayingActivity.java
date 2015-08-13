@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -35,6 +37,8 @@ public class NowPlayingActivity extends ActionBarActivity {
     private TextView mArtistName;
     private TextView mGenreName;
     private TextView mTitleName;
+    private SeekBar seekBar;
+    private Handler seekHandler;
 
     private ArrayList<String> songPath;
     private int songIndex;
@@ -65,6 +69,8 @@ public class NowPlayingActivity extends ActionBarActivity {
         mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
         mArtistName = (TextView) this.findViewById(R.id.artistNameText);
         mTitleName = (TextView) this.findViewById(R.id.titleNameText);
+        seekBar = (SeekBar) this.findViewById(R.id.seekBar);
+        seekHandler = new Handler();
         // ------- End of grabbing widgets -------
 
         int count =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
@@ -90,6 +96,7 @@ public class NowPlayingActivity extends ActionBarActivity {
         metaRetriver = new MediaMetadataRetriever();
         metaRetriver.setDataSource(songPath.get(songIndex));
         try {
+            //grabbing same data twice, might just send data from activity instead
             art = metaRetriver.getEmbeddedPicture();
             Bitmap songImage = BitmapFactory.decodeByteArray(art, 0, art.length);
             mAlbumArt.setImageBitmap(songImage);
@@ -144,6 +151,25 @@ public class NowPlayingActivity extends ActionBarActivity {
             SongQueueService.LocalBinder binder = (SongQueueService.LocalBinder) service;
             songService = binder.getServiceInstance();
             songService.prepareSongQueue(songPath, songIndex);
+            seekBar.setMax(songService.getDuration());
+            updateSeekProgress();
+            //make sure connection is established before wiring up seekbar
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    songService.seekTo(progress);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
         }
 
         @Override
@@ -179,6 +205,13 @@ public class NowPlayingActivity extends ActionBarActivity {
 
         }
 
+    }
+
+    Runnable run = new Runnable() { @Override public void run() { updateSeekProgress(); } };
+
+    public void updateSeekProgress() {
+        seekBar.setProgress(songService.getPosition());
+        seekHandler.postDelayed(run, 1000);
     }
 
     public void back(View v) {

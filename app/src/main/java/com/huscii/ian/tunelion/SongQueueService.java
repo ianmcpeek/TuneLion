@@ -13,6 +13,8 @@ import java.util.ArrayList;
 /**
  * Created by ian on 24/07/15.
  */
+
+//BROADCAST when new song is played
 public class SongQueueService extends Service {
     private final IBinder mBinder = new LocalBinder();
     private MediaPlayer player;
@@ -178,5 +180,17 @@ public class SongQueueService extends Service {
         } else {
             return 3;
         }
+    }
+
+    public int getDuration() {
+        return player.getDuration();
+    }
+
+    public int getPosition() {
+        return player.getCurrentPosition();
+    }
+
+    public void seekTo(int position) {
+        player.seekTo(position);
     }
 }

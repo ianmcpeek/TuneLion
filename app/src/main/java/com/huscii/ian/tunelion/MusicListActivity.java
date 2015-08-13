@@ -24,7 +24,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-
+//needs to register a simpleongesturelistener for fling
 public class MusicListActivity extends AppCompatActivity {
     private ArrayList<String> songPathList;
 
