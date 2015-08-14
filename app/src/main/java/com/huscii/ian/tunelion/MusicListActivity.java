@@ -128,7 +128,7 @@ public class MusicListActivity extends AppCompatActivity {
             Log.d("SongPathQueue", "Added song " + song);
             txtSong.setText(song);
             txtArtist.setText(artist);
-            txtAlbum.setText(song);
+            txtAlbum.setText(album);
             txtDuration.setText(String.format("%d:%d",
                     TimeUnit.MILLISECONDS.toMinutes(duration),
                     TimeUnit.MILLISECONDS.toSeconds(duration) -
