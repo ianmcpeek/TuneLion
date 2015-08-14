@@ -68,7 +68,7 @@ public class NowPlayingActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         dbHelper = new PlayCountContract.PlayCountDatabaseHelper(getApplicationContext());
         paused = false;
-
+        initViews();
         int count =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
         mPlayCount.setText("Play Count: " + count);
 
@@ -88,12 +88,11 @@ public class NowPlayingActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 songIndex = songService.getCurrentSongIndex();
                 //called metadata
+                getMetadataForSong();
+                seekBar.setMax(songService.getDuration());
             }
         };
-
         registerReceiver(reciever, filter);
-
-        getMetadataForSong();
 
         //check whether connected to internet
 //        if(checkForConnection()) {
@@ -157,6 +156,24 @@ public class NowPlayingActivity extends AppCompatActivity {
         // ------- Grab Seekbar -------
         seekBar = (SeekBar) this.findViewById(R.id.seekBar);
         seekHandler = new Handler();
+        //make sure connection is established before wiring up seekbar
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    songService.seekTo(progress);
+                } else {
+                    // nothing
+                }
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
     }
 
     /******************
@@ -254,26 +271,7 @@ public class NowPlayingActivity extends AppCompatActivity {
             SongQueueService.LocalBinder binder = (SongQueueService.LocalBinder) service;
             songService = binder.getServiceInstance();
             songService.prepareSongQueue(songPath, songIndex);
-            seekBar.setMax(songService.getDuration());
             updateSeekProgress();
-            //make sure connection is established before wiring up seekbar
-            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if (fromUser) {
-                        songService.seekTo(progress);
-                    } else {
-                        // nothing
-                    }
-
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {}
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {}
-            });
         }
 
         @Override
