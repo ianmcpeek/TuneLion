@@ -54,21 +54,21 @@
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:checked="true"-->
-            <!--android:onClick="onRadioClicked"-->
+            <!--android:playSong="onRadioClicked"-->
             <!--android:text="Gold"/>-->
 
         <!--<RadioButton-->
             <!--android:id="@+id/rdo_red"-->
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
-            <!--android:onClick="onRadioClicked"-->
+            <!--android:playSong="onRadioClicked"-->
             <!--android:text="Red"/>-->
 
         <!--<RadioButton-->
             <!--android:id="@+id/rdo_blue"-->
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
-            <!--android:onClick="onRadioClicked"-->
+            <!--android:playSong="onRadioClicked"-->
             <!--android:text="Blue"/>-->
     <!--</RadioGroup>-->
 

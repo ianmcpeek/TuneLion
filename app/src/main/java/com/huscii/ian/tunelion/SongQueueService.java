@@ -241,9 +241,8 @@ public class SongQueueService extends Service {
         isShuffle = false;
         loopPlaylist = false;
         loopSong = false;
-        //-----------------------------------------------
 
-        // This is called when the end of the song is reached
+        // This is called when the end of a song is reached
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
@@ -254,7 +253,6 @@ public class SongQueueService extends Service {
                 }
             }
         });
-        // --------------------------------------------------
     }
 
     @Override
@@ -278,12 +276,20 @@ public class SongQueueService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    /*
+     * Called by an activity to pass in a song queue to be played by the player
+     */
     public void prepareSongQueue(ArrayList<String> songPathList, int startIndex) {
         songPathQueue = songPathList;
         currentSongIndex = startIndex;
         prepareSong(currentSongIndex);
     }
 
+    /*
+     * Whether a song is completed, or the user presses the skip or previous button this is called
+     * to determine which song to play next in the playlist depending on which options are currently
+     * toggled.
+     */
     private boolean determineNextSong() {
         // loopSong may or may not work. not sure yet.
         if (loopSong) {
@@ -338,6 +344,11 @@ public class SongQueueService extends Service {
         return true;
     }
 
+    /**
+     * After the appropiate song index has been chosen, this method prepares which song to play.
+     * @param index
+     * @return returns true if song was successfully prepared.
+     */
     private boolean prepareSong(int index) {
         player.reset();
         try {
@@ -353,10 +364,18 @@ public class SongQueueService extends Service {
             e.printStackTrace();
             return false;
         }
+        sendBroadcast(new Intent("SONG_PREPARED"));
         return true;
     }
 
-    //trying to commit gradle
+    public int getCurrentSongIndex() {
+        return currentSongIndex;
+    }
+
+    /*******************
+        PLAYER CONTROLS
+     *******************/
+
     public void playSong() {
         isPlaying = true;
         player.start();
@@ -381,9 +400,21 @@ public class SongQueueService extends Service {
         return isPlaying;
     }
 
-    public int getCurrentSongIndex() {
-        return currentSongIndex;
+    public int getDuration() {
+        return player.getDuration();
     }
+
+    public int getPosition() {
+        return player.getCurrentPosition();
+    }
+
+    public void seekTo(int position) {
+        player.seekTo(position);
+    }
+
+    /*******************************
+        MULTI-FACED BUTTON CONTROLS
+     ******************************/
 
     public boolean toggleShuffle() {
         if(isShuffle) {
@@ -405,17 +436,5 @@ public class SongQueueService extends Service {
         } else {
             return 3;
         }
-    }
-
-    public int getDuration() {
-        return player.getDuration();
-    }
-
-    public int getPosition() {
-        return player.getCurrentPosition();
-    }
-
-    public void seekTo(int position) {
-        player.seekTo(position);
     }
 }

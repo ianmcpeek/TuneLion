@@ -1,8 +1,10 @@
 package com.huscii.ian.tunelion;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -31,6 +33,7 @@ public class NowPlayingActivity extends AppCompatActivity {
     private boolean paused;
     private Intent songServiceIntent;
     private SongQueueService songService;
+    private BroadcastReceiver reciever;
     private PlayCountContract.PlayCountDatabaseHelper dbHelper;
     private TextView mPlayCount;
     private ImageView mPlayButton;
@@ -40,6 +43,7 @@ public class NowPlayingActivity extends AppCompatActivity {
 
     private ArrayList<String> songPath;
     private int songIndex;
+
     // displaying album art
     ImageView mAlbumArt;
     MediaMetadataRetriever mMetaRetriever;
@@ -54,6 +58,9 @@ public class NowPlayingActivity extends AppCompatActivity {
 
     private final String TAG = "NowPlayingActivity";
 
+    /**************************
+        CORE ACTIVITY METHODS
+     **************************/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,20 +68,6 @@ public class NowPlayingActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         dbHelper = new PlayCountContract.PlayCountDatabaseHelper(getApplicationContext());
         paused = false;
-
-        // ------- Grab widgets from layout -------
-        mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
-        mPlayCount = (TextView) this.findViewById(R.id.playCountText);
-        mPlayButton = (ImageView)  this.findViewById(R.id.playButton);
-        mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
-        mArtistName = (TextView) this.findViewById(R.id.artistNameText);
-        mTitleName = (TextView) this.findViewById(R.id.titleNameText);
-        // ----------------------------------------
-
-        // ------- Grab Seekbar -------
-        seekBar = (SeekBar) this.findViewById(R.id.seekBar);
-        seekHandler = new Handler();
-        // ----------------------------
 
         int count =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
         mPlayCount.setText("Play Count: " + count);
@@ -85,6 +78,20 @@ public class NowPlayingActivity extends AppCompatActivity {
         //pass in path recieved from song item
         songPath = getIntent().getStringArrayListExtra("song_playlist");
         songIndex = getIntent().getIntExtra("song_index", -1);
+
+        //Register BroadcastReciever
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("SONG_PREPARED");
+
+        reciever = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                songIndex = songService.getCurrentSongIndex();
+                //called metadata
+            }
+        };
+
+        registerReceiver(reciever, filter);
 
         getMetadataForSong();
 
@@ -98,11 +105,22 @@ public class NowPlayingActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if(paused) {
             mPlayButton.setImageResource(R.drawable.play_button);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(reciever);
     }
 
     @Override
@@ -127,60 +145,42 @@ public class NowPlayingActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            SongQueueService.LocalBinder binder = (SongQueueService.LocalBinder) service;
-            songService = binder.getServiceInstance();
-            songService.prepareSongQueue(songPath, songIndex);
-            seekBar.setMax(songService.getDuration());
-            updateSeekProgress();
-            //make sure connection is established before wiring up seekbar
-            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if (fromUser) {
-                        songService.seekTo(progress);
-                    } else {
-                        // nothing
-                    }
+    public void initViews() {
+        // ------- Grab widgets from layout -------
+        mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
+        mPlayCount = (TextView) this.findViewById(R.id.playCountText);
+        mPlayButton = (ImageView)  this.findViewById(R.id.playButton);
+        mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
+        mArtistName = (TextView) this.findViewById(R.id.artistNameText);
+        mTitleName = (TextView) this.findViewById(R.id.titleNameText);
 
-                }
+        // ------- Grab Seekbar -------
+        seekBar = (SeekBar) this.findViewById(R.id.seekBar);
+        seekHandler = new Handler();
+    }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+    /******************
+        SONG CONTROLS
+     *****************/
 
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            //what to do on disconnect
-        }
-    };
-
-    public void onClick(View v) {
+    public void playSong(View v) {
         if(!songService.isPlaying()) {
             songService.playSong();
             mPlayButton.setImageResource(R.drawable.pause_button);
             paused = false;
 
-            //save play count to database
+            //Retrieve key to insert into database
+            String dbKey = mTitleName.getText().toString() +
+                    mArtistName.getText().toString() + mAlbumName.getText().toString();
+            //saves play count to database
             int playCount = 0;
-                    playCount =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
+            playCount =  PlayCountContract.read(dbKey, dbHelper);
             if(playCount > 0) {
                 //update
-                PlayCountContract.update("shake_it_off.mp3", playCount, dbHelper);
+                PlayCountContract.update(dbKey, playCount, dbHelper);
             } else {
                 //insert
-                PlayCountContract.insert("shake_it_off.mp3", dbHelper);
+                PlayCountContract.insert(dbKey, dbHelper);
             }
 
             //TextView txtPlay = (TextView)v.findViewById(R.id.txt_playcnt);
@@ -190,17 +190,6 @@ public class NowPlayingActivity extends AppCompatActivity {
             mPlayButton.setImageResource(R.drawable.play_button);
             paused = true;
         }
-    }
-
-    Runnable run = new Runnable() {
-        @Override public void run() {
-            updateSeekProgress();
-        }
-    };
-
-    public void updateSeekProgress() {
-        seekBar.setProgress(songService.getPosition());
-        seekHandler.postDelayed(run, 1000);
     }
 
     public void previousSong(View v) {
@@ -219,13 +208,19 @@ public class NowPlayingActivity extends AppCompatActivity {
         getMetadataForSong();
     }
 
-    public boolean checkForConnection() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null;
+    public void updateSeekProgress() {
+        seekBar.setProgress(songService.getPosition());
+        seekHandler.postDelayed(run, 1000);
     }
 
+    //used to periodically check seek progress
+    Runnable run = new Runnable() {
+        @Override public void run() {
+            updateSeekProgress();
+        }
+    };
+
+    //grabs song content to display for current song playing
     private void getMetadataForSong() {
         mAlbumArt = (ImageView) findViewById(R.id.albumArt);
         mMetaRetriever = new MediaMetadataRetriever();
@@ -248,7 +243,49 @@ public class NowPlayingActivity extends AppCompatActivity {
         }
     }
 
-    //    private class LastFMTask extends AsyncTask {
+    /***************************
+        SONG SERVICE CONNECTION
+     ***************************/
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            SongQueueService.LocalBinder binder = (SongQueueService.LocalBinder) service;
+            songService = binder.getServiceInstance();
+            songService.prepareSongQueue(songPath, songIndex);
+            seekBar.setMax(songService.getDuration());
+            updateSeekProgress();
+            //make sure connection is established before wiring up seekbar
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (fromUser) {
+                        songService.seekTo(progress);
+                    } else {
+                        // nothing
+                    }
+
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            //what to do on disconnect
+        }
+    };
+
+    /***********************
+        LAST.FM CONNECTION
+     **********************/
+//        private class LastFMTask extends AsyncTask {
 //
 //        @Override
 //        protected String doInBackground(Object[] params) {
@@ -266,4 +303,13 @@ public class NowPlayingActivity extends AppCompatActivity {
 //            mAlbumName.setText((String)result);
 //        }
 //    }
+    /* Checks if device is connected to the internet.
+     * Returns true if connected to a WiFi network.
+     */
+    public boolean checkForConnection() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
+    }
 }
