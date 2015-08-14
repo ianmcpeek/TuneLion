@@ -167,7 +167,6 @@ public class NowPlayingActivity extends AppCompatActivity {
     };
 
     public void onClick(View v) {
-
         if(!songService.isPlaying()) {
             songService.playSong();
             mPlayButton.setImageResource(R.drawable.pause_button);
@@ -191,7 +190,6 @@ public class NowPlayingActivity extends AppCompatActivity {
             mPlayButton.setImageResource(R.drawable.play_button);
             paused = true;
         }
-
     }
 
     Runnable run = new Runnable() {
