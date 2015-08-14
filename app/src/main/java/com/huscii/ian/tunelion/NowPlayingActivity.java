@@ -206,14 +206,16 @@ public class NowPlayingActivity extends AppCompatActivity {
     }
 
     public void previousSong(View v) {
-        Log.d(TAG, "previousSong got called. songindex: " + songIndex);
+        Log.d(TAG, "previousSong got called. songindex: " + songIndex + "\nsongPath: "
+                + songPath);
         mMetaRetriever.release();
         songService.previousSong();
         getMetadataForSong();
     }
 
     public void nextSong(View v) {
-        Log.d(TAG, "nextSong got called. songindex: " + songIndex);
+        Log.d(TAG, "nextSong got called. songindex: " + songIndex + "\nsongPath: "
+                + songPath);
         mMetaRetriever.release();
         songService.nextSong();
         getMetadataForSong();

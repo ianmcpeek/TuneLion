@@ -381,6 +381,10 @@ public class SongQueueService extends Service {
         return isPlaying;
     }
 
+    public int getCurrentSongIndex() {
+        return currentSongIndex;
+    }
+
     public boolean toggleShuffle() {
         if(isShuffle) {
             isShuffle = false;
