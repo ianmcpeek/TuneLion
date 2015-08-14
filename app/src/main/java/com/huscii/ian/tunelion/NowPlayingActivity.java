@@ -118,6 +118,8 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
 //            mGenreName.setText("Unknown Genre");
         }
         // ------- End of retrieving metadata -------
+
+
     }
 
     @Override
@@ -164,7 +166,12 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    songService.seekTo(progress);
+                    if (fromUser) {
+                        songService.seekTo(progress);
+                    } else {
+                        // nothing
+                    }
+
                 }
 
                 @Override
@@ -214,7 +221,11 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
 
     }
 
-    Runnable run = new Runnable() { @Override public void run() { updateSeekProgress(); } };
+    Runnable run = new Runnable() {
+        @Override public void run() {
+            updateSeekProgress();
+        }
+    };
 
     public void updateSeekProgress() {
         seekBar.setProgress(songService.getPosition());
@@ -245,7 +256,7 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
 
     @Override
     public void pause() {
-        songService.pauseSong();
+//        songService.pauseSong();
     }
 
     @Override
