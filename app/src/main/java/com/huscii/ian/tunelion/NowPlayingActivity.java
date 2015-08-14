@@ -14,56 +14,53 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 
-public class NowPlayingActivity extends AppCompatActivity implements MediaController.MediaPlayerControl {
+public class NowPlayingActivity extends AppCompatActivity {
     //use boolean to store whether song is playing or not
     //still needs volume control, randomize, repeat, skip
     private boolean paused;
     private Intent songServiceIntent;
     private SongQueueService songService;
     private PlayCountContract.PlayCountDatabaseHelper dbHelper;
-    private TextView mAlbumName;
     private TextView mPlayCount;
     private ImageView mPlayButton;
-    private TextView mArtistName;
-    private TextView mGenreName;
-    private TextView mTitleName;
+
     private SeekBar seekBar;
     private Handler seekHandler;
-    private MediaController mediaController;
 
     private ArrayList<String> songPath;
     private int songIndex;
-
-    // displaying metadata
-//    TextView album, artist, genre;
-
     // displaying album art
     ImageView mAlbumArt;
-    MediaMetadataRetriever metaRetriver;
+    MediaMetadataRetriever mMetaRetriever;
     byte[] art;
 
-    //MediaPlayer player;
+    // -- Metadata --
+    private TextView mArtistName;
+    private TextView mGenreName;
+    private TextView mTitleName;
+    private TextView mAlbumName;
+    // --------------
+
+    private final String TAG = "NowPlayingActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now_playing);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
-
-        paused = false;
         dbHelper = new PlayCountContract.PlayCountDatabaseHelper(getApplicationContext());
+        paused = false;
 
         // ------- Grab widgets from layout -------
         mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
@@ -72,12 +69,12 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
         mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
         mArtistName = (TextView) this.findViewById(R.id.artistNameText);
         mTitleName = (TextView) this.findViewById(R.id.titleNameText);
+        // ----------------------------------------
+
+        // ------- Grab Seekbar -------
         seekBar = (SeekBar) this.findViewById(R.id.seekBar);
         seekHandler = new Handler();
-        mediaController = new MediaController(this);
-        mediaController.setMediaPlayer(NowPlayingActivity.this);
-        mediaController.setAnchorView(findViewById(R.id.songMetadataBackground));
-        // ------- End of grabbing widgets -------
+        // ----------------------------
 
         int count =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
         mPlayCount.setText("Play Count: " + count);
@@ -89,6 +86,8 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
         songPath = getIntent().getStringArrayListExtra("song_playlist");
         songIndex = getIntent().getIntExtra("song_index", -1);
 
+        getMetadataForSong();
+
         //check whether connected to internet
 //        if(checkForConnection()) {
 //            new LastFMTask().execute();
@@ -96,30 +95,6 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
 //        } else {
 //            Toast.makeText(getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
 //        }
-
-        // ------- Retrieve metadata from song -------
-        mAlbumArt = (ImageView) findViewById(R.id.albumArt);
-        metaRetriver = new MediaMetadataRetriever();
-        metaRetriver.setDataSource(songPath.get(songIndex));
-        try {
-            //grabbing same data twice, might just send data from activity instead
-            art = metaRetriver.getEmbeddedPicture();
-            Bitmap songImage = BitmapFactory.decodeByteArray(art, 0, art.length);
-            mAlbumArt.setImageBitmap(songImage);
-            mAlbumName.setText(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
-            mArtistName.setText(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-            mTitleName.setText(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
-//            mGenreName.setText(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE));
-        } catch (Exception e) {
-            mAlbumArt.setImageResource(R.drawable.tunelion_logo);
-            mAlbumName.setText("Unknown Album");
-            mArtistName.setText("Unknown Artist");
-            mTitleName.setText("Unknown Title");
-//            mGenreName.setText("Unknown Genre");
-        }
-        // ------- End of retrieving metadata -------
-
-
     }
 
     @Override
@@ -160,7 +135,6 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
             songService = binder.getServiceInstance();
             songService.prepareSongQueue(songPath, songIndex);
             seekBar.setMax(songService.getDuration());
-            mediaController.show();
             updateSeekProgress();
             //make sure connection is established before wiring up seekbar
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -216,7 +190,6 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
             songService.pauseSong();
             mPlayButton.setImageResource(R.drawable.play_button);
             paused = true;
-
         }
 
     }
@@ -232,14 +205,18 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
         seekHandler.postDelayed(run, 1000);
     }
 
-    public void back(View v) {
-        //Button b = (Button)v.findViewById(R.id.btn_back);
-        songService.backSkipSong();
+    public void previousSong(View v) {
+        Log.d(TAG, "previousSong got called. songindex: " + songIndex);
+        mMetaRetriever.release();
+        songService.previousSong();
+        getMetadataForSong();
     }
 
-    public void skip(View v) {
-        //btn_skip = (Button)v.findViewById(R.id.btn_skip);
-        songService.forwardSkipSong();
+    public void nextSong(View v) {
+        Log.d(TAG, "nextSong got called. songindex: " + songIndex);
+        mMetaRetriever.release();
+        songService.nextSong();
+        getMetadataForSong();
     }
 
     public boolean checkForConnection() {
@@ -249,65 +226,26 @@ public class NowPlayingActivity extends AppCompatActivity implements MediaContro
         return activeNetworkInfo != null;
     }
 
-    @Override
-    public void start() {
-        songService.playSong();
-    }
-
-    @Override
-    public void pause() {
-//        songService.pauseSong();
-    }
-
-    @Override
-    public int getDuration() {
-        return 0;
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        return 0;
-    }
-
-    @Override
-    public void seekTo(int pos) {
-        songService.seekTo(pos);
-    }
-
-    @Override
-    public boolean isPlaying() {
-        return songService.isPlaying();
-    }
-
-    @Override
-    public int getBufferPercentage() {
-        return 0;
-    }
-
-    @Override
-    public boolean canPause() {
-        return false;
-    }
-
-    @Override
-    public boolean canSeekBackward() {
-        return false;
-    }
-
-    @Override
-    public boolean canSeekForward() {
-        return false;
-    }
-
-    @Override
-    public int getAudioSessionId() {
-        return 0;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mediaController.show();
-        return false;
+    private void getMetadataForSong() {
+        mAlbumArt = (ImageView) findViewById(R.id.albumArt);
+        mMetaRetriever = new MediaMetadataRetriever();
+        mMetaRetriever.setDataSource(songPath.get(songIndex));
+        try {
+            //grabbing same data twice, might just send data from activity instead
+            art = mMetaRetriever.getEmbeddedPicture();
+            Bitmap songImage = BitmapFactory.decodeByteArray(art, 0, art.length);
+            mAlbumArt.setImageBitmap(songImage);
+            mAlbumName.setText(mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
+            mArtistName.setText(mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+            mTitleName.setText(mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+//            mGenreName.setText(mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE));
+        } catch (Exception e) {
+            mAlbumArt.setImageResource(R.drawable.tunelion_logo);
+            mAlbumName.setText("Unknown Album");
+            mArtistName.setText("Unknown Artist");
+            mTitleName.setText("Unknown Title");
+//            mGenreName.setText("Unknown Genre");
+        }
     }
 
     //    private class LastFMTask extends AsyncTask {

@@ -1,12 +1,9 @@
 package com.huscii.ian.tunelion;
 
-import android.app.ListActivity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -54,10 +51,10 @@ public class MusicListActivity extends AppCompatActivity {
                 selection,
                 null,
                 null);
-        ListView lv = (ListView) findViewById(R.id.list_view);
+        ListView mSongList = (ListView) findViewById(R.id.songList);
         SongCursorAdapter adapter = new SongCursorAdapter(this, cursor, 0);
-        lv.setAdapter(adapter);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mSongList.setAdapter(adapter);
+        mSongList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Toast.makeText(getApplicationContext(), "You touched me! ;)", Toast.LENGTH_SHORT).show();
