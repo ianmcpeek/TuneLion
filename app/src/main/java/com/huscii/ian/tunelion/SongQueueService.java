@@ -217,7 +217,6 @@ public class SongQueueService extends Service {
 
     //controls for song player
     private boolean isPreviousPressed;
-    private boolean isNextPressed;
     private boolean isShuffle;
     private boolean isPlaying;
     private boolean loopSong;
@@ -236,7 +235,6 @@ public class SongQueueService extends Service {
 
         // --------- starts all fields as false ---------
         isPreviousPressed = false;
-        isNextPressed = false;
         isPlaying = false;
         isShuffle = false;
         loopPlaylist = false;
@@ -291,57 +289,47 @@ public class SongQueueService extends Service {
      * toggled.
      */
     private boolean determineNextSong() {
-        // loopSong may or may not work. not sure yet.
-        if (loopSong) {
-            //do nothing, index is the same
-        } else if (isPreviousPressed) { // previous song selected
-            isPreviousPressed = false; // make's previous no longer selected
-            if (currentSongIndex - 1 < 0) { // if currentSongIndex is at beginning of songPathQueue
-                currentSongIndex = songPathQueue.size() - 1;
-                /* Don't need this here, only applicable if the song is playing
-                 * and the next song is the end of the playlist
-                 */
-                // if (!loopPlaylist) {
-                //     playlistOver = true;
-                // }
-            } else {
-                currentSongIndex--; // makes currentSongIndex goto previous song
-            }
-        } else if (isNextPressed) { // next song selected
-            Log.d(TAG, "This part was reached");
-            if (currentSongIndex + 1 > songPathQueue.size() -1 ) {
-                Log.d(TAG, "This part was reached endofPlaylist");
-                currentSongIndex = 0;
-                /* Don't need this here, only applicable if the song is playing
-                 * and the next song is the end of the playlist
-                 */
-                // if(loopPlaylist) {
-                //     playlistOver = true;
-                // }
-            } else {
-                currentSongIndex++;
-            }
-        } else { // if neither is pressed, then the loop applies
-            if (currentSongIndex + 1 > songPathQueue.size() - 1) {
-                if (loopPlaylist) {
-                    currentSongIndex = 0; // goes to next song
-                } else {
-                    return false;
-                }
-            } else {
-                currentSongIndex++;
-            }
+        //check if loop song is pressed
+        if(loopSong) {
+            //don't change index, same one will be used to prepare song
+        } else if(isShuffle) {
+            currentSongIndex = (int)(Math.random()*songPathQueue.size());
+        } else if(isPreviousPressed) {
+            currentSongIndex -= 1;
+        //Otherwise when a song is completed or next is clicked, advance index forward
+        } else {
+            currentSongIndex += 1;
         }
 
-        /* Don't need this here, only applicable if the song is playing
-        * and the next song is the end of the playlist
-        */
-        // if(playlistOver) {
-        //     return false;
-        // }
+        //validate whether index is within bounds
+        if(validateSongIndex()) {
+            prepareSong(currentSongIndex);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-        prepareSong(currentSongIndex);
-        return true;
+    private boolean validateSongIndex() {
+        //check if index is out of bounds
+        if(currentSongIndex >= songPathQueue.size() || currentSongIndex < 0) {
+            //if so, continue validating if loopPlaylist is pressed
+            if(loopPlaylist) {
+                //determine whether song is advancing backwards or forwards
+                if(isPreviousPressed) {
+                    isPreviousPressed = false;
+                    currentSongIndex = songPathQueue.size()-1;
+                } else {
+                    currentSongIndex = 0;
+                }
+                return true;
+            } else {
+                currentSongIndex = songPathQueue.size();
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -392,7 +380,6 @@ public class SongQueueService extends Service {
     }
 
     public void nextSong() {
-        isNextPressed = true;
         determineNextSong();
     }
 
@@ -429,11 +416,13 @@ public class SongQueueService extends Service {
         if(!loopSong && !loopPlaylist) {
             loopPlaylist = true;
             return 1;
-        } else if(loopPlaylist) {
+        } else if(loopPlaylist && !loopSong) {
             loopPlaylist = false;
             loopSong = true;
             return 2;
         } else {
+            loopPlaylist = false;
+            loopSong = false;
             return 3;
         }
     }

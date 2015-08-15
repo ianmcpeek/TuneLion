@@ -95,37 +95,13 @@
         android:layout_centerHorizontal="true"/>
 
     <ImageView
-        android:id="@+id/repeatOffButton"
+        android:id="@+id/repeatButton"
         android:src="@drawable/repeat_off_button"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginLeft="15dp"
         android:layout_marginBottom="5dp"
-        android:onClick="back"
-        android:text="@string/back_text"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"/>
-
-    <ImageView
-        android:id="@+id/repeatOneButton"
-        android:src="@drawable/repeat_off_button"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginBottom="5dp"
-        android:onClick="back"
-        android:text="@string/back_text"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"/>
-
-    <ImageView
-        android:id="@+id/repeatAllButton"
-        android:src="@drawable/repeat_off_button"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginBottom="5dp"
-        android:onClick="back"
+        android:onClick="repeatSongs"
         android:text="@string/back_text"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"/>
@@ -156,11 +132,14 @@
         android:layout_toRightOf="@+id/playButton"
         android:layout_toEndOf="@+id/playButton"/>
 
-    <MediaController
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/mediaController"
-        android:layout_above="@+id/seekBar"
-        android:layout_centerHorizontal="true" />
+    <ImageView
+        android:id="@+id/shuffleButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/shuffle_off_button"
+        android:onClick="shuffleSongs"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"/>
+
 
 </RelativeLayout>

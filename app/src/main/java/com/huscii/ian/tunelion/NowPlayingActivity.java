@@ -37,6 +37,8 @@ public class NowPlayingActivity extends AppCompatActivity {
     private PlayCountContract.PlayCountDatabaseHelper dbHelper;
     private TextView mPlayCount;
     private ImageView mPlayButton;
+    private ImageView mRepeatButton;
+    private ImageView mShuffleButton;
 
     private SeekBar seekBar;
     private Handler seekHandler;
@@ -69,8 +71,6 @@ public class NowPlayingActivity extends AppCompatActivity {
         dbHelper = new PlayCountContract.PlayCountDatabaseHelper(getApplicationContext());
         paused = false;
         initViews();
-        int count =  PlayCountContract.read("shake_it_off.mp3", dbHelper);
-        mPlayCount.setText("Play Count: " + count);
 
         songServiceIntent = new Intent(this, SongQueueService.class);
         startService(songServiceIntent);
@@ -149,9 +149,18 @@ public class NowPlayingActivity extends AppCompatActivity {
         mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
         mPlayCount = (TextView) this.findViewById(R.id.playCountText);
         mPlayButton = (ImageView)  this.findViewById(R.id.playButton);
+        mRepeatButton = (ImageView)  this.findViewById(R.id.repeatButton);
+        mShuffleButton = (ImageView)  this.findViewById(R.id.shuffleButton);
         mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
         mArtistName = (TextView) this.findViewById(R.id.artistNameText);
         mTitleName = (TextView) this.findViewById(R.id.titleNameText);
+
+        // --------- Set Play Count ---------
+        String dbKey = mTitleName.getText().toString() +
+                mArtistName.getText().toString() + mAlbumName.getText().toString();
+        int count = 0;
+        count =  PlayCountContract.read(dbKey, dbHelper);
+        mPlayCount.setText("Play Count: " + count);
 
         // ------- Grab Seekbar -------
         seekBar = (SeekBar) this.findViewById(R.id.seekBar);
@@ -185,28 +194,30 @@ public class NowPlayingActivity extends AppCompatActivity {
             songService.playSong();
             mPlayButton.setImageResource(R.drawable.pause_button);
             paused = false;
-
-            //Retrieve key to insert into database
-            String dbKey = mTitleName.getText().toString() +
-                    mArtistName.getText().toString() + mAlbumName.getText().toString();
-            //saves play count to database
-            int playCount = 0;
-            playCount =  PlayCountContract.read(dbKey, dbHelper);
-            if(playCount > 0) {
-                //update
-                PlayCountContract.update(dbKey, playCount, dbHelper);
-            } else {
-                //insert
-                PlayCountContract.insert(dbKey, dbHelper);
-            }
-
-            //TextView txtPlay = (TextView)v.findViewById(R.id.txt_playcnt);
-            this.mPlayCount.setText("Play Count: " + playCount);
+            updatePlayCount();
         } else {
             songService.pauseSong();
             mPlayButton.setImageResource(R.drawable.play_button);
             paused = true;
         }
+    }
+
+    public void updatePlayCount() {
+        //Retrieve key to insert into database
+        String dbKey = mTitleName.getText().toString() +
+                mArtistName.getText().toString() + mAlbumName.getText().toString();
+        //saves play count to database
+        int playCount = 0;
+        playCount =  PlayCountContract.read(dbKey, dbHelper);
+        if(playCount > 0) {
+            //update
+            PlayCountContract.update(dbKey, playCount, dbHelper);
+        } else {
+            //insert
+            PlayCountContract.insert(dbKey, dbHelper);
+        }
+        //TextView txtPlay = (TextView)v.findViewById(R.id.txt_playcnt);
+        mPlayCount.setText("Play Count: " + playCount);
     }
 
     public void previousSong(View v) {
@@ -223,6 +234,31 @@ public class NowPlayingActivity extends AppCompatActivity {
         mMetaRetriever.release();
         songService.nextSong();
         getMetadataForSong();
+    }
+
+    public void shuffleSongs(View v) {
+        if(songService.toggleShuffle()) {
+            mShuffleButton.setImageResource(R.drawable.shuffle_on_button);
+        } else {
+            mShuffleButton.setImageResource(R.drawable.shuffle_off_button);
+        }
+    }
+
+    public void repeatSongs(View v) {
+        switch(songService.toggleRepeat()) {
+            //loop playlist
+            case 1:
+                mRepeatButton.setImageResource(R.drawable.repeat_all_button);
+                break;
+            //loop song
+            case 2:
+                mRepeatButton.setImageResource(R.drawable.repeat_one_button);
+                break;
+            //off
+            case 3:
+                mRepeatButton.setImageResource(R.drawable.repeat_off_button);
+                break;
+        }
     }
 
     public void updateSeekProgress() {
