@@ -310,6 +310,8 @@ public class SongQueueService extends Service {
         }
     }
 
+    // this method still doesn't work with next and previous :(
+    // it is always shuffling. I will try and work on this tomorrow.
     private boolean validateSongIndex() {
         //check if index is out of bounds
         if(currentSongIndex >= songPathQueue.size() || currentSongIndex < 0) {
