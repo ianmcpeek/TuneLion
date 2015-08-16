@@ -1,7 +1,9 @@
 package com.huscii.ian.tunelion;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.os.Bundle;
@@ -18,12 +20,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 //needs to register a simpleongesturelistener for fling
 public class MusicListActivity extends AppCompatActivity {
+    BroadcastReceiver reciever;
     private ArrayList<String> songPathList;
+    private int songIndex;
+
+    private ArrayList<LabeledContainer> musicData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,32 +40,13 @@ public class MusicListActivity extends AppCompatActivity {
 
         songPathList = new ArrayList<>();
 
-        //retrieve existing music on phone
-        String[] projection = {
-                //MediaStore.Audio.Media.CONTENT_TYPE,
-                MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.DISPLAY_NAME,
-                MediaStore.Audio.Media.DURATION,
-                MediaStore.Audio.Media.ALBUM,
-                MediaStore.Audio.Media.YEAR
-        };
-        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
-        Cursor cursor = getContentResolver().query(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                selection,
-                null,
-                null);
         ListView mSongList = (ListView) findViewById(R.id.songList);
-        SongCursorAdapter adapter = new SongCursorAdapter(this, cursor, 0);
-        mSongList.setAdapter(adapter);
+        //SongCursorAdapter adapter = new SongCursorAdapter(this, cursor, 0);
+        //mSongList.setAdapter(adapter);
         mSongList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                Toast.makeText(getApplicationContext(), "You touched me! ;)", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "You touched me! ;)", Toast.LENGTH_SHORT).show();
 
                 //start nowPlaying activity, pass in song path as an extra
                 Intent intent = new Intent(v.getContext(), NowPlayingActivity.class);
@@ -66,6 +55,22 @@ public class MusicListActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        //Register BroadcastReciever
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("SONG_PREPARED");
+
+        reciever = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                songIndex = intent.getExtras().getInt("INDEX");
+                //set now playing fragment
+                TextView mSongName = (TextView) findViewById(R.id.songName);
+                TextView mSongArtist = (TextView) findViewById(R.id.songArtist);
+                mSongName.setText(songPathList.get(songIndex));
+            }
+        };
+        registerReceiver(reciever, filter);
 
         //Used to change contents within list bro
         //adapter.changeCursor(newCursor);
@@ -93,6 +98,74 @@ public class MusicListActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void getMusicData() {
+        musicData = new ArrayList<LabeledContainer>();
+
+        //retrieve existing music on phone
+        String[] projection = {
+                //MediaStore.Audio.Media.CONTENT_TYPE,
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.YEAR
+        };
+        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
+        Cursor cursor = getContentResolver().query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                null,
+                null);
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast()) {
+            String song = cursor.getString(cursor.getColumnIndex("TITLE"));
+            String artist = cursor.getString(cursor.getColumnIndex("ARTIST"));
+            String album = cursor.getString(cursor.getColumnIndex("ALBUM"));
+            int duration = cursor.getInt(cursor.getColumnIndex("DURATION"));
+            //Used to change song
+            String dataSource = cursor.getString(3);
+//        if(!songPathList.contains(dataSource)) {
+//            songPathList.add(dataSource);
+//        }
+
+            //Check if Artist already exists
+            boolean artistFound = false;
+            boolean albumFound = false;
+
+            for(LabeledContainer cArtist:musicData) {
+                //artistfound
+                if(cArtist.getLabel().equals(artist)) {
+                    //Check if Album already exists
+                    for(int i=0; i<cArtist.getContainer().size(); i++) {
+                        LabeledContainer cAlbum = (LabeledContainer)cArtist.getContainer().get(i);
+                        if(cAlbum.getLabel().equals(album)) {
+                            //add into album container
+                            cAlbum.getContainer().add(new SongData(song,artist,album,dataSource));
+                            break;
+                        }
+                    }
+                    //create new album
+                    break;
+                }
+            }
+            //Artist not found
+            //add new artist and album
+        }
+
+
+    }
+
+    public void continueNowPlaying(View v) {
+        //still broken, need to fix now playing onCreate
+        Intent nowPlaying = new Intent(MusicListActivity.this, NowPlayingActivity.class);
+        nowPlaying.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(nowPlaying);
     }
 
     public class SongCursorAdapter extends CursorAdapter {

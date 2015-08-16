@@ -352,7 +352,9 @@ public class SongQueueService extends Service {
             e.printStackTrace();
             return false;
         }
-        sendBroadcast(new Intent("SONG_PREPARED"));
+        Intent i = new Intent("SONG_PREPARED");
+        i.putExtra("INDEX", currentSongIndex);
+        sendBroadcast(i);
         return true;
     }
 

@@ -120,6 +120,7 @@ public class NowPlayingActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(reciever);
+        unbindService(mConnection);
     }
 
     @Override

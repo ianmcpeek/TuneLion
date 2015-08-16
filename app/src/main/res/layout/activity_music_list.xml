@@ -11,7 +11,9 @@
         android:id="@+id/songListTitle"
         android:text="Songs"
         android:padding="10dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <ListView
         android:layout_width="wrap_content"
@@ -32,6 +34,7 @@
         android:background="@color/mint_green"/>
 
     <TextView
+        android:id="@+id/songArtist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Testing for now will change later"
@@ -41,6 +44,7 @@
         android:textColor="@color/white"/>
 
     <TextView
+        android:id="@+id/songName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Now playing:"
@@ -49,5 +53,27 @@
         android:layout_marginLeft="20dp"
         android:textColor="@color/white"
         android:textStyle="italic"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Playlists"
+        android:id="@+id/textView"
+        android:layout_marginRight="48dp"
+        android:layout_marginEnd="48dp"
+        android:layout_above="@+id/songList"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Albums"
+        android:id="@+id/textView2"
+        android:layout_above="@+id/songList"
+        android:layout_alignRight="@+id/songName"
+        android:layout_alignEnd="@+id/songName" />
 
 </RelativeLayout>
