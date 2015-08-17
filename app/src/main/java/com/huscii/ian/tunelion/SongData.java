@@ -31,4 +31,17 @@ public class SongData {
     public String getSongPath() {
         return songPath;
     }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean sameSame = false;
+
+        if (object != null && object instanceof SongData)
+        {
+            sameSame = this.songName == ((SongData) object).songName && this.songArtist == ((SongData) object).songArtist;
+        }
+
+        return sameSame;
+    }
 }

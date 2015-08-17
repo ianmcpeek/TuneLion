@@ -28,21 +28,19 @@ import java.util.concurrent.TimeUnit;
 //needs to register a simpleongesturelistener for fling
 public class MusicListActivity extends AppCompatActivity {
     BroadcastReceiver reciever;
-    private ArrayList<String> songPathList;
     private int songIndex;
 
-    private ArrayList<LabeledContainer> musicData;
+    private ArrayList<SongData> musicData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
-
-        songPathList = new ArrayList<>();
+        musicData = new ArrayList<SongData>();
 
         ListView mSongList = (ListView) findViewById(R.id.songList);
-        //SongCursorAdapter adapter = new SongCursorAdapter(this, cursor, 0);
-        //mSongList.setAdapter(adapter);
+        SongCursorAdapter adapter = new SongCursorAdapter(this, getCursor(), 0);
+        mSongList.setAdapter(adapter);
         mSongList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -50,7 +48,7 @@ public class MusicListActivity extends AppCompatActivity {
 
                 //start nowPlaying activity, pass in song path as an extra
                 Intent intent = new Intent(v.getContext(), NowPlayingActivity.class);
-                intent.putStringArrayListExtra("song_playlist", songPathList);
+                intent.putStringArrayListExtra("song_playlist", getSongPaths());
                 intent.putExtra("song_index", position);
                 startActivity(intent);
             }
@@ -67,7 +65,8 @@ public class MusicListActivity extends AppCompatActivity {
                 //set now playing fragment
                 TextView mSongName = (TextView) findViewById(R.id.songName);
                 TextView mSongArtist = (TextView) findViewById(R.id.songArtist);
-                mSongName.setText(songPathList.get(songIndex));
+                mSongName.setText(musicData.get(songIndex).getSongName());
+                mSongArtist.setText(musicData.get(songIndex).getSongArtist());
             }
         };
         registerReceiver(reciever, filter);
@@ -100,8 +99,32 @@ public class MusicListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public Cursor getCursor() {
+        //retrieve existing music on phone
+        String[] projection = {
+                //MediaStore.Audio.Media.CONTENT_TYPE,
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.YEAR
+        };
+        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
+        Cursor cursor = getContentResolver().query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                null,
+                null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
     public void getMusicData() {
-        musicData = new ArrayList<LabeledContainer>();
+        musicData = new ArrayList<SongData>();
 
         //retrieve existing music on phone
         String[] projection = {
@@ -130,35 +153,25 @@ public class MusicListActivity extends AppCompatActivity {
             int duration = cursor.getInt(cursor.getColumnIndex("DURATION"));
             //Used to change song
             String dataSource = cursor.getString(3);
-//        if(!songPathList.contains(dataSource)) {
-//            songPathList.add(dataSource);
-//        }
 
-            //Check if Artist already exists
-            boolean artistFound = false;
-            boolean albumFound = false;
-
-            for(LabeledContainer cArtist:musicData) {
-                //artistfound
-                if(cArtist.getLabel().equals(artist)) {
-                    //Check if Album already exists
-                    for(int i=0; i<cArtist.getContainer().size(); i++) {
-                        LabeledContainer cAlbum = (LabeledContainer)cArtist.getContainer().get(i);
-                        if(cAlbum.getLabel().equals(album)) {
-                            //add into album container
-                            cAlbum.getContainer().add(new SongData(song,artist,album,dataSource));
-                            break;
-                        }
-                    }
-                    //create new album
-                    break;
-                }
-            }
-            //Artist not found
-            //add new artist and album
+            musicData.add(new SongData(song, artist, album, dataSource));
         }
+    }
 
+    public ArrayList<String> getSongs() {
+        ArrayList<String> songs = new ArrayList<String>();
+        for(SongData song:musicData) {
+            songs.add(song.getSongName());
+        }
+        return songs;
+    }
 
+    public ArrayList<String> getSongPaths() {
+        ArrayList<String> songs = new ArrayList<String>();
+        for(SongData song:musicData) {
+            songs.add(song.getSongPath());
+        }
+        return songs;
     }
 
     public void continueNowPlaying(View v) {
@@ -193,11 +206,14 @@ public class MusicListActivity extends AppCompatActivity {
             String artist = cursor.getString(cursor.getColumnIndex("ARTIST"));
             String album = cursor.getString(cursor.getColumnIndex("ALBUM"));
             int duration = cursor.getInt(cursor.getColumnIndex("DURATION"));
-            //Used to change song
             String dataSource = cursor.getString(3);
-            if(!songPathList.contains(dataSource)) {
-                songPathList.add(dataSource);
+
+            SongData songData = new SongData(song, artist, album, dataSource);
+            if(!musicData.contains(songData)) {
+                musicData.add(songData);
             }
+
+            //Check how to display data
             Log.d("SongPathQueue", "Added song " + song);
             txtSong.setText(song);
             txtArtist.setText(artist);
