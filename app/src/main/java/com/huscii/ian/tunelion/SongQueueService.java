@@ -289,20 +289,21 @@ public class SongQueueService extends Service {
      * toggled.
      */
     private boolean determineNextSong() {
+        int indexStart = currentSongIndex;
         //check if loop song is pressed
         if(loopSong) {
             //don't change index, same one will be used to prepare song
         } else if(isShuffle) {
             currentSongIndex = (int)(Math.random()*songPathQueue.size());
         } else if(isPreviousPressed) {
-            currentSongIndex -= 1;
+            currentSongIndex = (currentSongIndex>0)?currentSongIndex-1:0;
         //Otherwise when a song is completed or next is clicked, advance index forward
         } else {
-            currentSongIndex += 1;
+            currentSongIndex = (currentSongIndex<songPathQueue.size()-1)?currentSongIndex+1:songPathQueue.size()-1;
         }
 
         //validate whether index is within bounds
-        if(validateSongIndex()) {
+        if(!checkPlaylistOver(indexStart)) {
             prepareSong(currentSongIndex);
             return true;
         } else {
@@ -310,28 +311,24 @@ public class SongQueueService extends Service {
         }
     }
 
-    // this method still doesn't work with next and previous :(
-    // it is always shuffling. I will try and work on this tomorrow.
-    private boolean validateSongIndex() {
-        //check if index is out of bounds
-        if(currentSongIndex >= songPathQueue.size() || currentSongIndex < 0) {
-            //if so, continue validating if loopPlaylist is pressed
-            if(loopPlaylist) {
-                //determine whether song is advancing backwards or forwards
-                if(isPreviousPressed) {
-                    isPreviousPressed = false;
-                    currentSongIndex = songPathQueue.size()-1;
-                } else {
-                    currentSongIndex = 0;
-                }
-                return true;
-            } else {
-                currentSongIndex = songPathQueue.size();
-                return false;
+    private boolean checkPlaylistOver(int indexStart) {
+        boolean playlistOver = false;
+        if(loopPlaylist) {
+            //make sure songIndex is 0 and hasn't been set on this method call
+            if(isPreviousPressed && currentSongIndex==0 && currentSongIndex==indexStart) {
+                currentSongIndex = songPathQueue.size()-1;
+            //make sure songIndex is size-1 and hasn't been set on this method call
+            }else if(currentSongIndex==songPathQueue.size()-1 && currentSongIndex==indexStart) {
+                currentSongIndex = 0;
             }
         } else {
-            return true;
+            //Check if song is either beginning or end of playlist, and index hasn't been set on this method call
+            if((currentSongIndex == songPathQueue.size()-1 || currentSongIndex == 0) && currentSongIndex==indexStart) {
+                playlistOver = true;
+            }
         }
+        isPreviousPressed = false;
+        return playlistOver;
     }
 
     /**

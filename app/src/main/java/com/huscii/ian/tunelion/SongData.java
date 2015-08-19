@@ -39,7 +39,7 @@ public class SongData {
 
         if (object != null && object instanceof SongData)
         {
-            sameSame = this.songName == ((SongData) object).songName && this.songArtist == ((SongData) object).songArtist;
+            sameSame = this.songName.equals(((SongData) object).songName) && this.songArtist.equals( ((SongData) object).songArtist);
         }
 
         return sameSame;

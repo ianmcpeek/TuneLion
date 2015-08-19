@@ -209,12 +209,20 @@ public class MusicListActivity extends AppCompatActivity {
             String dataSource = cursor.getString(3);
 
             SongData songData = new SongData(song, artist, album, dataSource);
-            if(!musicData.contains(songData)) {
+            boolean exists = false;
+            for(SongData sData :musicData) {
+                if(sData.equals(songData)) {
+                    Log.d("SongPathQueue", "Song found " + song);
+                    exists = true;
+                    break;
+                }
+            }
+            if(!exists) {
                 musicData.add(songData);
+                Log.d("SongPathQueue", "Added song " + song + " size: " + musicData.size());
             }
 
             //Check how to display data
-            Log.d("SongPathQueue", "Added song " + song);
             txtSong.setText(song);
             txtArtist.setText(artist);
             txtAlbum.setText(album);
