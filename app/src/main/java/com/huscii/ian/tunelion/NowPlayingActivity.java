@@ -91,10 +91,16 @@ public class NowPlayingActivity extends AppCompatActivity {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                // gets current song
                 mSongIndex = songService.getCurrentSongIndex();
-                //called metadata
+
+                // display metadata when new song appears
                 getMetadataForSong();
+
+                // display proper playcount
                 displayPlayCount();
+
+                // sets correct seekbar
                 mSeekBar.setProgress(0);
                 mSeekBar.setMax(songService.getDuration());
             }
