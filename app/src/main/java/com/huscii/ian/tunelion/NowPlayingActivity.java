@@ -33,18 +33,21 @@ public class NowPlayingActivity extends AppCompatActivity {
     private boolean paused;
     private Intent songServiceIntent;
     private SongQueueService songService;
-    private BroadcastReceiver reciever;
+    private BroadcastReceiver receiver;
     private PlayCountContract.PlayCountDatabaseHelper dbHelper;
     private TextView mPlayCount;
     private ImageView mPlayButton;
     private ImageView mRepeatButton;
     private ImageView mShuffleButton;
 
-    private SeekBar seekBar;
+    private SeekBar mSeekBar;
     private Handler seekHandler;
 
+    // playCount update
+    private boolean alreadyUpdated;
+
     private ArrayList<String> songPath;
-    private int songIndex;
+    private int mSongIndex;
 
     // displaying album art
     ImageView mAlbumArt;
@@ -72,27 +75,31 @@ public class NowPlayingActivity extends AppCompatActivity {
         paused = false;
         initViews();
 
+        alreadyUpdated = false;
+
         songServiceIntent = new Intent(this, SongQueueService.class);
         startService(songServiceIntent);
         bindService(songServiceIntent, mConnection, Context.BIND_AUTO_CREATE);
         //pass in path recieved from song item
         songPath = getIntent().getStringArrayListExtra("song_playlist");
-        songIndex = getIntent().getIntExtra("song_index", -1);
+        mSongIndex = getIntent().getIntExtra("song_index", 0);
 
         //Register BroadcastReciever
         IntentFilter filter = new IntentFilter();
         filter.addAction("SONG_PREPARED");
 
-        reciever = new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                songIndex = songService.getCurrentSongIndex();
+                mSongIndex = songService.getCurrentSongIndex();
                 //called metadata
                 getMetadataForSong();
-                seekBar.setMax(songService.getDuration());
+                displayPlayCount();
+                mSeekBar.setProgress(0);
+                mSeekBar.setMax(songService.getDuration());
             }
         };
-        registerReceiver(reciever, filter);
+        registerReceiver(receiver, filter);
 
         //check whether connected to internet
 //        if(checkForConnection()) {
@@ -119,7 +126,7 @@ public class NowPlayingActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(reciever);
+        unregisterReceiver(receiver);
         unbindService(mConnection);
     }
 
@@ -156,33 +163,31 @@ public class NowPlayingActivity extends AppCompatActivity {
         mArtistName = (TextView) this.findViewById(R.id.artistNameText);
         mTitleName = (TextView) this.findViewById(R.id.titleNameText);
 
-        // --------- Set Play Count ---------
-        String dbKey = mTitleName.getText().toString() +
-                mArtistName.getText().toString() + mAlbumName.getText().toString();
-        int count = 0;
-        count =  PlayCountContract.read(dbKey, dbHelper);
-        mPlayCount.setText("Play Count: " + count);
+        displayPlayCount();
 
         // ------- Grab Seekbar -------
-        seekBar = (SeekBar) this.findViewById(R.id.seekBar);
+        mSeekBar = (SeekBar) this.findViewById(R.id.seekBar);
         seekHandler = new Handler();
         //make sure connection is established before wiring up seekbar
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    songService.seekTo(progress);
-                } else {
-                    // nothing
-                }
+                // for skipping through the song when holding skip bar
+                if (fromUser) songService.seekTo(progress);
 
+                // 1 == .001 seconds
+                if (progress >= songService.getDuration() - 1) {
+                    updatePlayCount();
+                }
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
     }
 
@@ -195,7 +200,6 @@ public class NowPlayingActivity extends AppCompatActivity {
             songService.playSong();
             mPlayButton.setImageResource(R.drawable.pause_button);
             paused = false;
-            updatePlayCount();
         } else {
             songService.pauseSong();
             mPlayButton.setImageResource(R.drawable.play_button);
@@ -203,38 +207,18 @@ public class NowPlayingActivity extends AppCompatActivity {
         }
     }
 
-    public void updatePlayCount() {
-        //Retrieve key to insert into database
-        String dbKey = mTitleName.getText().toString() +
-                mArtistName.getText().toString() + mAlbumName.getText().toString();
-        //saves play count to database
-        int playCount = 0;
-        playCount =  PlayCountContract.read(dbKey, dbHelper);
-        if(playCount > 0) {
-            //update
-            PlayCountContract.update(dbKey, playCount, dbHelper);
-        } else {
-            //insert
-            PlayCountContract.insert(dbKey, dbHelper);
-        }
-        //TextView txtPlay = (TextView)v.findViewById(R.id.txt_playcnt);
-        mPlayCount.setText("Play Count: " + playCount);
-    }
-
     public void previousSong(View v) {
-        Log.d(TAG, "previousSong got called. songindex: " + songIndex + "\nsongPath: "
+        Log.d(TAG, "previousSong got called. songindex: " + mSongIndex + "\nsongPath: "
                 + songPath);
         mMetaRetriever.release();
         songService.previousSong();
-        getMetadataForSong();
     }
 
     public void nextSong(View v) {
-        Log.d(TAG, "nextSong got called. songindex: " + songIndex + "\nsongPath: "
+        Log.d(TAG, "nextSong got called. songindex: " + mSongIndex + "\nsongPath: "
                 + songPath);
         mMetaRetriever.release();
         songService.nextSong();
-        getMetadataForSong();
     }
 
     public void shuffleSongs(View v) {
@@ -262,8 +246,33 @@ public class NowPlayingActivity extends AppCompatActivity {
         }
     }
 
+
+    public void updatePlayCount() {
+        //Retrieve key to insert into database
+        String dbKey = mTitleName.getText().toString() +
+                mArtistName.getText().toString() + mAlbumName.getText().toString();
+        //saves play count to database
+        int playCount;
+        playCount =  PlayCountContract.read(dbKey, dbHelper);
+        if(playCount > 0) {
+            //update
+            PlayCountContract.update(dbKey, playCount, dbHelper);
+        } else {
+            //insert
+            PlayCountContract.insert(dbKey, dbHelper);
+        }
+    }
+
+    private void displayPlayCount() {
+        String dbKey = mTitleName.getText().toString() +
+                mArtistName.getText().toString() + mAlbumName.getText().toString();
+        int playCount;
+        playCount =  PlayCountContract.read(dbKey, dbHelper);
+        mPlayCount.setText("Play Count: " + playCount);
+    }
+
     public void updateSeekProgress() {
-        seekBar.setProgress(songService.getPosition());
+        mSeekBar.setProgress(songService.getPosition());
         seekHandler.postDelayed(run, 1000);
     }
 
@@ -278,7 +287,7 @@ public class NowPlayingActivity extends AppCompatActivity {
     private void getMetadataForSong() {
         mAlbumArt = (ImageView) findViewById(R.id.albumArt);
         mMetaRetriever = new MediaMetadataRetriever();
-        mMetaRetriever.setDataSource(songPath.get(songIndex));
+        mMetaRetriever.setDataSource(songPath.get(mSongIndex));
         try {
             //grabbing same data twice, might just send data from activity instead
             art = mMetaRetriever.getEmbeddedPicture();
@@ -307,7 +316,7 @@ public class NowPlayingActivity extends AppCompatActivity {
                                        IBinder service) {
             SongQueueService.LocalBinder binder = (SongQueueService.LocalBinder) service;
             songService = binder.getServiceInstance();
-            songService.prepareSongQueue(songPath, songIndex);
+            songService.prepareSongQueue(songPath, mSongIndex);
             updateSeekProgress();
         }
 

@@ -227,7 +227,7 @@ public class SongQueueService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        songPathQueue = new ArrayList<String>();
+        songPathQueue = new ArrayList<>();
 
         // Creates the media player
         // *Note: R.raw.opossom_girl is a work-around
@@ -296,14 +296,16 @@ public class SongQueueService extends Service {
         } else if(isShuffle) {
             currentSongIndex = (int)(Math.random()*songPathQueue.size());
         } else if(isPreviousPressed) {
-            currentSongIndex = (currentSongIndex>0)?currentSongIndex-1:0;
+            currentSongIndex = (currentSongIndex > 0) ? currentSongIndex - 1 : 0;
         //Otherwise when a song is completed or next is clicked, advance index forward
         } else {
-            currentSongIndex = (currentSongIndex<songPathQueue.size()-1)?currentSongIndex+1:songPathQueue.size()-1;
+            currentSongIndex =
+                    (currentSongIndex < songPathQueue.size() - 1)
+                            ? currentSongIndex + 1 : songPathQueue.size() - 1;
         }
 
         //validate whether index is within bounds
-        if(!checkPlaylistOver(indexStart)) {
+        if (!checkPlaylistOver(indexStart)) {
             prepareSong(currentSongIndex);
             return true;
         } else {
@@ -313,17 +315,21 @@ public class SongQueueService extends Service {
 
     private boolean checkPlaylistOver(int indexStart) {
         boolean playlistOver = false;
-        if(loopPlaylist) {
+        if (loopPlaylist) {
             //make sure songIndex is 0 and hasn't been set on this method call
-            if(isPreviousPressed && currentSongIndex==0 && currentSongIndex==indexStart) {
-                currentSongIndex = songPathQueue.size()-1;
+            if (isPreviousPressed && currentSongIndex == 0
+                    && currentSongIndex == indexStart) {
+                currentSongIndex = songPathQueue.size();
             //make sure songIndex is size-1 and hasn't been set on this method call
-            }else if(currentSongIndex==songPathQueue.size()-1 && currentSongIndex==indexStart) {
+            }else if (currentSongIndex == songPathQueue.size()
+                    && currentSongIndex == indexStart) {
                 currentSongIndex = 0;
             }
         } else {
             //Check if song is either beginning or end of playlist, and index hasn't been set on this method call
-            if((currentSongIndex == songPathQueue.size()-1 || currentSongIndex == 0) && currentSongIndex==indexStart) {
+            if ((currentSongIndex == songPathQueue.size()
+                    || currentSongIndex == 0)
+                    && currentSongIndex == indexStart) {
                 playlistOver = true;
             }
         }
@@ -405,7 +411,7 @@ public class SongQueueService extends Service {
      ******************************/
 
     public boolean toggleShuffle() {
-        if(isShuffle) {
+        if (isShuffle) {
             isShuffle = false;
         } else {
             isShuffle = true;
@@ -414,7 +420,7 @@ public class SongQueueService extends Service {
     }
 
     public int toggleRepeat() {
-        if(!loopSong && !loopPlaylist) {
+        if (!loopSong && !loopPlaylist) {
             loopPlaylist = true;
             return 1;
         } else if(loopPlaylist && !loopSong) {
