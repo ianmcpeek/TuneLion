@@ -2,9 +2,7 @@ package com.huscii.ian.tunelion;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.media.Image;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -20,7 +18,6 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Bundle;
-import android.preference.DialogPreference;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -34,8 +31,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import de.umass.lastfm.Artist;
-import de.umass.lastfm.Caller;
+// lastfm java library
+//import de.umass.lastfm.Artist;
+//import de.umass.lastfm.Caller;
 
 
 public class NowPlayingActivity extends AppCompatActivity {
@@ -66,7 +64,6 @@ public class NowPlayingActivity extends AppCompatActivity {
 
     // -- Metadata --
     private TextView mArtistName;
-    private TextView mGenreName;
     private TextView mTitleName;
     private TextView mAlbumName;
     // --------------
@@ -242,7 +239,7 @@ public class NowPlayingActivity extends AppCompatActivity {
                                     edit.putString("color", "one_day_explosion");
                                     break;
                             }
-                            edit.commit();
+                            edit.apply();
                         }
                     })
                     .setPositiveButton("I changed my mind ಠ_ಠ",
@@ -370,11 +367,6 @@ public class NowPlayingActivity extends AppCompatActivity {
             }
         };
         registerReceiver(receiver, filter);
-    }
-
-    //checks whether service has already been created
-    private void prepareServiceResponseReciever() {
-
     }
 
     /******************

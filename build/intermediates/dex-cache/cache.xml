@@ -6,35 +6,35 @@
         jumboMode="false"
         revision="22.0.1"
         sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
-        <dex dex="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\classes-a5d697e2396932434ba349bce864052467872ac9.jar" />
-    </item>
-    <item
-        jar="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\libs\internal_impl-22.2.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
-        <dex dex="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\internal_impl-22.2.0-58eeba5622a150c9f249f20803f8faa931e8a021.jar" />
-    </item>
-    <item
-        jar="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.2.0\jars\classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
-        <dex dex="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\classes-83d7f047962795a58868fad5a77bc5a0737ee630.jar" />
+        <dex dex="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\pre-dexed\release\classes-a5d697e2396932434ba349bce864052467872ac9.jar" />
     </item>
     <item
         jar="C:\Users\Jef\StudioProjects\TuneLion\app\libs\lastfm-java-0.1.2.jar"
         jumboMode="false"
         revision="22.0.1"
         sha1="b1d6f0040f614b09bebfde1cf346ab4a6ffff81d">
-        <dex dex="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\lastfm-java-0.1.2-9b1876704451f65a73eaa42bb944dfc4936f2271.jar" />
+        <dex dex="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\pre-dexed\release\lastfm-java-0.1.2-9b1876704451f65a73eaa42bb944dfc4936f2271.jar" />
+    </item>
+    <item
+        jar="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\libs\internal_impl-22.2.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
+        <dex dex="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\pre-dexed\release\internal_impl-22.2.0-58eeba5622a150c9f249f20803f8faa931e8a021.jar" />
+    </item>
+    <item
+        jar="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
+        <dex dex="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\pre-dexed\release\classes-83d7f047962795a58868fad5a77bc5a0737ee630.jar" />
     </item>
     <item
         jar="C:\Users\Jef\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\22.2.0\support-annotations-22.2.0.jar"
         jumboMode="false"
         revision="22.0.1"
         sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
-        <dex dex="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\pre-dexed\debug\support-annotations-22.2.0-40adb3e318785c5f92c0bdce79abb432994467c4.jar" />
+        <dex dex="C:\Users\Jef\StudioProjects\TuneLion\app\build\intermediates\pre-dexed\release\support-annotations-22.2.0-40adb3e318785c5f92c0bdce79abb432994467c4.jar" />
     </item>
 
 </items>

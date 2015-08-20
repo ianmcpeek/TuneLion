@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.os.Bundle;
@@ -35,7 +36,7 @@ public class MusicListActivity extends AppCompatActivity {
 
     private ArrayList<SongData> musicData;
 
-//    private boolean sortSongListByAlbumName = true;
+    private ImageView mNowPlayingWidget;
 
     private final String TAG = "MusicListActivity";
 
@@ -97,22 +98,6 @@ public class MusicListActivity extends AppCompatActivity {
             }
         };
         registerReceiver(reciever, filter);
-        //Add in static datasource if empty
-
-//        // clicking songs/albums/playlists will switch
-//        final TextView albumListTextView = (TextView) this.findViewById(R.id.albumListTitle);
-//        albumListTextView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d(TAG, "I was pressed");
-//                sortSongListByAlbumName = true;
-//            }
-//        });
-
-        //Used to change contents within list bro
-        //adapter.changeCursor(newCursor);
-
-        //cursor.close();
     }
 
     @Override
@@ -155,49 +140,6 @@ public class MusicListActivity extends AppCompatActivity {
         cursor.moveToFirst();
         return cursor;
     }
-
-//    public void getMusicData() {
-//        musicData = new ArrayList<SongData>();
-//
-//        //retrieve existing music on phone
-//        String[] projection = {
-//                //MediaStore.Audio.Media.CONTENT_TYPE,
-//                MediaStore.Audio.Media._ID,
-//                MediaStore.Audio.Media.ARTIST,
-//                MediaStore.Audio.Media.TITLE,
-//                MediaStore.Audio.Media.DATA,
-//                MediaStore.Audio.Media.DISPLAY_NAME,
-//                MediaStore.Audio.Media.DURATION,
-//                MediaStore.Audio.Media.ALBUM,
-//                MediaStore.Audio.Media.YEAR
-//        };
-//        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
-//        Cursor cursor = getContentResolver().query(
-//                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-//                projection,
-//                selection,
-//                null,
-//                null);
-//        cursor.moveToFirst();
-//        while(!cursor.isAfterLast()) {
-//            String song = cursor.getString(cursor.getColumnIndex("TITLE"));
-//            String artist = cursor.getString(cursor.getColumnIndex("ARTIST"));
-//            String album = cursor.getString(cursor.getColumnIndex("ALBUM"));
-//            int duration = cursor.getInt(cursor.getColumnIndex("DURATION"));
-//            //Used to change song
-//            String dataSource = cursor.getString(3);
-//
-//            musicData.add(new SongData(song, artist, album, dataSource));
-//        }
-//    }
-
-//    public ArrayList<String> getSongs() {
-//        ArrayList<String> songs = new ArrayList<String>();
-//        for(SongData song:musicData) {
-//            songs.add(song.getSongName());
-//        }
-//        return songs;
-//    }
 
     public ArrayList<String> getSongPaths() {
         ArrayList<String> songs = new ArrayList<>();
@@ -252,16 +194,6 @@ public class MusicListActivity extends AppCompatActivity {
             }
             if (!exists) {
                 musicData.add(songData);
-//                if (!sortSongListByAlbumName) {
-//                    Collections.sort(musicData, new Comparator<SongData>() {
-//                        public int compare(SongData s1, SongData s2) {
-//                            Log.d(TAG, "We made it: " + s1.getSongAlbum().toLowerCase() + " compared to "
-//                                    .compareTo(s2.getSongAlbum().toLowerCase()));
-//                            return s1.getSongAlbum().toLowerCase()
-//                                    .compareTo(s2.getSongAlbum().toLowerCase());
-//                        }
-//                    });
-//                }
                 Log.d("SongPathQueue", "Added song " + song + " size: " + musicData.size());
             }
 
