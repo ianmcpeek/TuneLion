@@ -31,7 +31,9 @@
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_height="75dp"
-        android:background="@color/mint_green"/>
+        android:background="@color/mint_green"
+        android:onClick="continueNowPlaying"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/songArtist"
@@ -41,7 +43,8 @@
         android:layout_alignBottom="@+id/nowPlayingWidget"
         android:layout_marginBottom="23dp"
         android:layout_marginLeft="20dp"
-        android:textColor="@color/white"/>
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/songAlbum"
@@ -53,7 +56,8 @@
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/songArtist"
         android:textColor="@color/white"
-        android:textStyle="italic"/>
+        android:textStyle="italic"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/songName"
@@ -64,6 +68,7 @@
         android:layout_marginBottom="38dp"
         android:layout_marginLeft="20dp"
         android:textColor="@color/white"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:visibility="gone" />
 
 </RelativeLayout>

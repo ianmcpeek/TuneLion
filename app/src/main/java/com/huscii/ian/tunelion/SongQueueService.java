@@ -249,8 +249,6 @@ public class SongQueueService extends Service {
             public void onCompletion(MediaPlayer mp) {
                 if (determineNextSong()) {
                     Log.d("OnCompletion", "current song index " + currentSongIndex + " out of " + songPathQueue.size());
-                    //player.start();
-                    //player.release();
                 } else {
                     player.stop();
                     isPlaying = false;
@@ -262,6 +260,7 @@ public class SongQueueService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        player.release();
     }
 
     @Override
@@ -283,10 +282,17 @@ public class SongQueueService extends Service {
     /*
      * Called by an activity to pass in a song queue to be played by the player
      */
-    public void prepareSongQueue(ArrayList<String> songPathList, int startIndex) {
-        songPathQueue = songPathList;
-        currentSongIndex = startIndex;
-        prepareSong(currentSongIndex, songPathQueue);
+    public void prepareSongQueue(ArrayList<String> songPathList, int startIndex, boolean isResumed) {
+        if(isResumed) {
+            Intent i = new Intent("SONG_PREPARED");
+            i.putExtra("INDEX", currentSongIndex);
+            i.putExtra("PATH", (isShuffle ? shuffleQueue:songPathQueue).get(currentSongIndex));
+            sendBroadcast(i);
+        } else {
+            songPathQueue = songPathList;
+            currentSongIndex = startIndex;
+            prepareSong(currentSongIndex, songPathQueue);
+        }
         //if shuffle is enabled on this call, call createshuffle playlist first
     }
 

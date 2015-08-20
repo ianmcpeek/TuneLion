@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,6 +57,7 @@ public class MusicListActivity extends AppCompatActivity {
                 Intent intent = new Intent(v.getContext(), NowPlayingActivity.class);
                 intent.putStringArrayListExtra("song_playlist", getSongPaths());
                 intent.putExtra("song_index", position);
+                intent.putExtra("continue", false);
                 startActivity(intent);
             }
         });
@@ -72,9 +74,16 @@ public class MusicListActivity extends AppCompatActivity {
                 TextView mSongName = (TextView) findViewById(R.id.songName);
                 TextView mSongArtist = (TextView) findViewById(R.id.songArtist);
                 TextView mSongAlbum = (TextView) findViewById(R.id.songAlbum);
+                ImageView mWidget = (ImageView) findViewById(R.id.nowPlayingWidget);
+
+
                 mSongName.setText(musicData.get(songIndex).getSongName());
                 mSongArtist.setText(musicData.get(songIndex).getSongArtist());
                 mSongAlbum.setText(musicData.get(songIndex).getSongAlbum());
+                mWidget.setVisibility(View.VISIBLE);
+                mSongName.setVisibility(View.VISIBLE);
+                mSongArtist.setVisibility(View.VISIBLE);
+                mSongAlbum.setVisibility(View.VISIBLE);
             }
         };
         registerReceiver(reciever, filter);
@@ -192,12 +201,14 @@ public class MusicListActivity extends AppCompatActivity {
         return songs;
     }
 
-//    public void continueNowPlaying(View v) {
-//        //still broken, need to fix now playing onCreate
-//        Intent nowPlaying = new Intent(MusicListActivity.this, NowPlayingActivity.class);
-//        nowPlaying.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//        startActivity(nowPlaying);
-//    }
+    public void continueNowPlaying(View v) {
+        //still broken, need to fix now playing onCreate
+        Intent intent = new Intent(MusicListActivity.this, NowPlayingActivity.class);
+        intent.putStringArrayListExtra("song_playlist", getSongPaths());
+        intent.putExtra("song_index", songIndex);
+        intent.putExtra("continue", true);
+        startActivity(intent);
+    }
 
     private class SongCursorAdapter extends CursorAdapter {
         public SongCursorAdapter(Context context, Cursor c, int flags) {

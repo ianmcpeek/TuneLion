@@ -30,7 +30,6 @@ import java.util.ArrayList;
 public class NowPlayingActivity extends AppCompatActivity {
     //use boolean to store whether song is playing or not
     //still needs volume control, randomize, repeat, skip
-    private boolean paused;
     private Intent songServiceIntent;
     private SongQueueService songService;
     private BroadcastReceiver receiver;
@@ -44,7 +43,7 @@ public class NowPlayingActivity extends AppCompatActivity {
     private Handler seekHandler;
 
     // playCount update
-    private boolean alreadyUpdated;
+    private boolean isResumed;
 
     private ArrayList<String> songPath;
     private int mSongIndex;
@@ -72,10 +71,7 @@ public class NowPlayingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_now_playing);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         dbHelper = new PlayCountContract.PlayCountDatabaseHelper(getApplicationContext());
-        paused = false;
         initViews();
-
-        alreadyUpdated = false;
 
         songServiceIntent = new Intent(this, SongQueueService.class);
         startService(songServiceIntent);
@@ -83,37 +79,10 @@ public class NowPlayingActivity extends AppCompatActivity {
         //pass in path recieved from song item
         songPath = getIntent().getStringArrayListExtra("song_playlist");
         mSongIndex = getIntent().getIntExtra("song_index", 0);
+        isResumed = getIntent().getExtras().getBoolean("continue");
 
         //Register BroadcastReciever
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("SONG_PREPARED");
-
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                // gets current song
-                mSongIndex = songService.getCurrentSongIndex();
-
-                // display metadata when new song appears
-                getMetadataForSong(intent.getExtras().getString("PATH"));
-
-                // display proper playcount
-                displayPlayCount();
-
-                // sets correct seekbar
-                mSeekBar.setProgress(0);
-                mSeekBar.setMax(songService.getDuration());
-
-                if(songService.isPlaying()) {
-                    mPlayButton.setImageResource(R.drawable.pause_button);
-                    paused = false;
-                } else {
-                    mPlayButton.setImageResource(R.drawable.play_button);
-                    paused = true;
-                }
-            }
-        };
-        registerReceiver(receiver, filter);
+       prepareSongPreparedReciever();
 
         //check whether connected to internet
 //        if(checkForConnection()) {
@@ -132,9 +101,6 @@ public class NowPlayingActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(paused) {
-            mPlayButton.setImageResource(R.drawable.play_button);
-        }
     }
 
     @Override
@@ -205,6 +171,45 @@ public class NowPlayingActivity extends AppCompatActivity {
         });
     }
 
+    /************************
+        BROADCAST RECIEVERS
+     ************************/
+
+    private void prepareSongPreparedReciever() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("SONG_PREPARED");
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // gets current song
+                mSongIndex = songService.getCurrentSongIndex();
+
+                // display metadata when new song appears
+                getMetadataForSong(intent.getExtras().getString("PATH"));
+
+                // display proper playcount
+                displayPlayCount();
+
+                // sets correct seekbar
+                mSeekBar.setProgress(0);
+                mSeekBar.setMax(songService.getDuration());
+
+                if(songService.isPlaying()) {
+                    mPlayButton.setImageResource(R.drawable.pause_button);
+                } else {
+                    mPlayButton.setImageResource(R.drawable.play_button);
+                }
+            }
+        };
+        registerReceiver(receiver, filter);
+    }
+
+    //checks whether service has already been created
+    private void prepareServiceResponseReciever() {
+
+    }
+
     /******************
         SONG CONTROLS
      *****************/
@@ -213,11 +218,9 @@ public class NowPlayingActivity extends AppCompatActivity {
         if(!songService.isPlaying()) {
             songService.playSong();
             mPlayButton.setImageResource(R.drawable.pause_button);
-            paused = false;
         } else {
             songService.pauseSong();
             mPlayButton.setImageResource(R.drawable.play_button);
-            paused = true;
         }
     }
 
@@ -332,7 +335,7 @@ public class NowPlayingActivity extends AppCompatActivity {
                                        IBinder service) {
             SongQueueService.LocalBinder binder = (SongQueueService.LocalBinder) service;
             songService = binder.getServiceInstance();
-            songService.prepareSongQueue(songPath, mSongIndex);
+            songService.prepareSongQueue(songPath, mSongIndex, isResumed);
             updateSeekProgress();
         }
 
