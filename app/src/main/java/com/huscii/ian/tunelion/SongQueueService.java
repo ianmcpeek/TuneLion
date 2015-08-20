@@ -307,7 +307,9 @@ public class SongQueueService extends Service {
             songPathQueue = songPathList;
             currentSongIndex = startIndex;
             //if shuffle is enabled on this call, call createshuffle playlist first
-            createShuffledPlaylist();
+            if(isShuffle) {
+                createShuffledPlaylist();
+            }
             prepareSong(currentSongIndex, songPathQueue);
         }
     }

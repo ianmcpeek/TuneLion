@@ -70,6 +70,15 @@ public class MusicListActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 songIndex = intent.getExtras().getInt("INDEX");
+                String path = intent.getExtras().getString("PATH");
+                //look for songdata matching path
+                int i = 0;
+                for(SongData songData: musicData) {
+                    if(songData.getSongPath().equals(path)) {
+                        break; //found match
+                    }
+                    i++;
+                }
                 //set now playing fragment
                 TextView mSongName = (TextView) findViewById(R.id.songName);
                 TextView mSongArtist = (TextView) findViewById(R.id.songArtist);
@@ -77,9 +86,9 @@ public class MusicListActivity extends AppCompatActivity {
                 ImageView mWidget = (ImageView) findViewById(R.id.nowPlayingWidget);
 
 
-                mSongName.setText(musicData.get(songIndex).getSongName());
-                mSongArtist.setText(musicData.get(songIndex).getSongArtist());
-                mSongAlbum.setText(musicData.get(songIndex).getSongAlbum());
+                mSongName.setText(musicData.get(i).getSongName());
+                mSongArtist.setText(musicData.get(i).getSongArtist());
+                mSongAlbum.setText(musicData.get(i).getSongAlbum());
                 mWidget.setVisibility(View.VISIBLE);
                 mSongName.setVisibility(View.VISIBLE);
                 mSongArtist.setVisibility(View.VISIBLE);
@@ -87,6 +96,7 @@ public class MusicListActivity extends AppCompatActivity {
             }
         };
         registerReceiver(reciever, filter);
+        //Add in static datasource if empty
 
 //        // clicking songs/albums/playlists will switch
 //        final TextView albumListTextView = (TextView) this.findViewById(R.id.albumListTitle);
