@@ -118,11 +118,6 @@ public class MusicListActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -202,7 +197,6 @@ public class MusicListActivity extends AppCompatActivity {
     }
 
     public void continueNowPlaying(View v) {
-        //still broken, need to fix now playing onCreate
         Intent intent = new Intent(MusicListActivity.this, NowPlayingActivity.class);
         intent.putStringArrayListExtra("song_playlist", getSongPaths());
         intent.putExtra("song_index", songIndex);

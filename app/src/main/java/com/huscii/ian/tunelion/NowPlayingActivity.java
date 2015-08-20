@@ -1,5 +1,8 @@
 package com.huscii.ian.tunelion;
 
+import android.app.DialogFragment;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,6 +18,7 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -23,8 +27,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import de.umass.lastfm.Artist;
+import de.umass.lastfm.Caller;
+import de.umass.lastfm.Track;
 
 
 public class NowPlayingActivity extends AppCompatActivity {
@@ -59,6 +68,9 @@ public class NowPlayingActivity extends AppCompatActivity {
     private TextView mTitleName;
     private TextView mAlbumName;
     // --------------
+
+    // Vars for Last.FM
+    private String lastfmAristName;
 
     private final String TAG = "NowPlayingActivity";
 
@@ -124,9 +136,11 @@ public class NowPlayingActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        LastFMTask lastFMTask = new LastFMTask();
+
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.lastfm_artist_info) {
+            lastFMTask.execute();
         }
 
         return super.onOptionsItemSelected(item);
@@ -312,16 +326,20 @@ public class NowPlayingActivity extends AppCompatActivity {
             art = mMetaRetriever.getEmbeddedPicture();
             Bitmap songImage = BitmapFactory.decodeByteArray(art, 0, art.length);
             mAlbumArt.setImageBitmap(songImage);
-            mAlbumName.setText(mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
-            mArtistName.setText(mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-            mTitleName.setText(mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
-//            mGenreName.setText(mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE));
+            mAlbumName.setText
+                    (mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
+            mArtistName.setText
+                    (mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+            mTitleName.setText
+                    (mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+            // Set artist name for Last.FM
+            lastfmAristName =
+                    mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
         } catch (Exception e) {
             mAlbumArt.setImageResource(R.drawable.tunelion_logo);
             mAlbumName.setText("Unknown Album");
             mArtistName.setText("Unknown Artist");
             mTitleName.setText("Unknown Title");
-//            mGenreName.setText("Unknown Genre");
         }
     }
 
@@ -348,24 +366,36 @@ public class NowPlayingActivity extends AppCompatActivity {
     /***********************
         LAST.FM CONNECTION
      **********************/
-//        private class LastFMTask extends AsyncTask {
-//
-//        @Override
-//        protected String doInBackground(Object[] params) {
-//            Caller.getInstance().setCache(null);
-//            Caller.getInstance().setUserAgent("tst");
-//            String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
-//            String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
-//            Track track = Track.getInfo("Taylor Swift", "Shake it Off", key);
-//            //track.getAlbum();
-//            return track.getAlbum();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Object result) {
-//            mAlbumName.setText((String)result);
-//        }
-//    }
+        private class LastFMTask extends AsyncTask {
+
+        @Override
+        protected String doInBackground(Object[] params) {
+            Caller.getInstance().setCache(null);
+            Caller.getInstance().setUserAgent("tst");
+            String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
+            String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
+            Artist artist = Artist.getInfo(lastfmAristName, key);
+            return artist.getWikiSummary();
+        }
+
+        @Override
+        protected void onPostExecute(Object result) {
+            new AlertDialog.Builder(NowPlayingActivity.this)
+                    .setTitle(lastfmAristName)
+                    .setMessage((String) result)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // continue with delete
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })
+                    .show();
+        }
+    }
     /* Checks if device is connected to the internet.
      * Returns true if connected to a WiFi network.
      */
