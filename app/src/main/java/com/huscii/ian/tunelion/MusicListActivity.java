@@ -58,6 +58,7 @@ public class MusicListActivity extends AppCompatActivity {
                 intent.putStringArrayListExtra("song_playlist", getSongPaths());
                 intent.putExtra("song_index", position);
                 intent.putExtra("continue", false);
+                Log.d(TAG, "position: "+ position + "Songpath: " + getSongPaths());
                 startActivity(intent);
             }
         });

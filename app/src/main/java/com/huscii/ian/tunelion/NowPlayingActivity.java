@@ -1,6 +1,7 @@
 package com.huscii.ian.tunelion;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -19,6 +20,7 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Bundle;
+import android.preference.DialogPreference;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -69,8 +71,12 @@ public class NowPlayingActivity extends AppCompatActivity {
     private TextView mAlbumName;
     // --------------
 
-    // Vars for Last.FM
+    // vars for Last.FM Browser
     private String artistNameBio;
+
+    // vars for theming
+    ImageView mButtonBackground;
+    ImageView mSongMetadataBackground;
 
     private final String TAG = "NowPlayingActivity";
 
@@ -83,7 +89,42 @@ public class NowPlayingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_now_playing);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         dbHelper = new PlayCountContract.PlayCountDatabaseHelper(getApplicationContext());
+
         initViews();
+        SharedPreferences settings = getPreferences(0);
+        String bgColor = settings.getString("color","one_day_explosion");
+        switch (bgColor) {
+            case "sofft_reddy_pink":
+                mButtonBackground
+                        .setBackgroundResource(R.color.sofft_reddy_pink);
+                mSongMetadataBackground
+                        .setBackgroundResource(R.color.sofft_reddy_pink);
+                break;
+            case "holland":
+                mButtonBackground
+                        .setBackgroundResource(R.color.holland);
+                mSongMetadataBackground
+                        .setBackgroundResource(R.color.holland);
+                break;
+            case "over_easy_please":
+                mButtonBackground
+                        .setBackgroundResource(R.color.over_easy_please);
+                mSongMetadataBackground
+                        .setBackgroundResource(R.color.over_easy_please);
+                break;
+            case "bug_leg":
+                mButtonBackground
+                        .setBackgroundResource(R.color.bug_leg);
+                mSongMetadataBackground
+                        .setBackgroundResource(R.color.bug_leg);
+                break;
+            case "one_day_explosion":
+                mButtonBackground
+                        .setBackgroundResource(R.color.one_day_explosion);
+                mSongMetadataBackground
+                        .setBackgroundResource(R.color.one_day_explosion);
+                break;
+        }
 
         songServiceIntent = new Intent(this, SongQueueService.class);
         startService(songServiceIntent);
@@ -155,11 +196,11 @@ public class NowPlayingActivity extends AppCompatActivity {
                 "bug leg",
                 "one day explosion"
         };
-        final ImageView mButtonBackground = (ImageView) findViewById(R.id.buttonBackground);
-        final ImageView mSongMetadataBackground =
-                (ImageView) findViewById(R.id.songMetadataBackground);
 
         if (id == R.id.themeChanger) {
+            SharedPreferences settings = getPreferences(0);
+            final SharedPreferences.Editor edit = settings.edit();
+
             new AlertDialog.Builder(NowPlayingActivity.this)
                     .setTitle("Change me please (・ω・)")
                     .setItems(colors, new DialogInterface.OnClickListener() {
@@ -171,35 +212,42 @@ public class NowPlayingActivity extends AppCompatActivity {
                                             .setBackgroundResource(R.color.sofft_reddy_pink);
                                     mSongMetadataBackground
                                             .setBackgroundResource(R.color.sofft_reddy_pink);
+                                    edit.putString("color", "sofft_reddy_pink");
                                     break;
                                 case 1:
                                     mButtonBackground
                                             .setBackgroundResource(R.color.holland);
                                     mSongMetadataBackground
                                             .setBackgroundResource(R.color.holland);
+                                    edit.putString("color", "holland");
                                     break;
                                 case 2:
                                     mButtonBackground
                                             .setBackgroundResource(R.color.over_easy_please);
                                     mSongMetadataBackground
                                             .setBackgroundResource(R.color.over_easy_please);
+                                    edit.putString("color", "over_easy_please");
                                     break;
                                 case 3:
                                     mButtonBackground
                                             .setBackgroundResource(R.color.bug_leg);
                                     mSongMetadataBackground
                                             .setBackgroundResource(R.color.bug_leg);
+                                    edit.putString("color", "bug_leg");
                                     break;
                                 case 4:
                                     mButtonBackground
                                             .setBackgroundResource(R.color.one_day_explosion);
                                     mSongMetadataBackground
                                             .setBackgroundResource(R.color.one_day_explosion);
+                                    edit.putString("color", "one_day_explosion");
                                     break;
                             }
+                            edit.commit();
                         }
                     })
-                    .setPositiveButton("I changed my mind ಠ_ಠ", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("I changed my mind ಠ_ಠ",
+                            new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // lolz
                         }
@@ -239,6 +287,9 @@ public class NowPlayingActivity extends AppCompatActivity {
         mAlbumName = (TextView) this.findViewById(R.id.albumNameText);
         mArtistName = (TextView) this.findViewById(R.id.artistNameText);
         mTitleName = (TextView) this.findViewById(R.id.titleNameText);
+
+        mSongMetadataBackground = (ImageView) findViewById(R.id.songMetadataBackground);
+        mButtonBackground = (ImageView) findViewById(R.id.buttonBackground);
 
         displayPlayCount();
 
@@ -469,43 +520,43 @@ public class NowPlayingActivity extends AppCompatActivity {
     /***********************
         LAST.FM CONNECTION
      **********************/
-        private class LastFMTask extends AsyncTask {
-
-        @Override
-        protected String doInBackground(Object[] params) {
-            Caller.getInstance().setCache(null);
-            Caller.getInstance().setUserAgent("tst");
-            String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
-            String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
-            Artist artist = Artist.getInfo(artistNameBio, key);
-            return artist.getWikiSummary();
-        }
-
-        @Override
-        protected void onPostExecute(Object result) {
-            new AlertDialog.Builder(NowPlayingActivity.this)
-                    .setTitle(artistNameBio)
-                    .setMessage((String) result)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // continue with delete
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // do nothing
-                        }
-                    })
-                    .show();
-        }
-    }
-    /* Checks if device is connected to the internet.
-     * Returns true if connected to a WiFi network.
-     */
-    public boolean checkForConnection() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null;
-    }
+//        private class LastFMTask extends AsyncTask {
+//
+//        @Override
+//        protected String doInBackground(Object[] params) {
+//            Caller.getInstance().setCache(null);
+//            Caller.getInstance().setUserAgent("tst");
+//            String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
+//            String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
+//            Artist artist = Artist.getInfo(artistNameBio, key);
+//            return artist.getWikiSummary();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Object result) {
+//            new AlertDialog.Builder(NowPlayingActivity.this)
+//                    .setTitle(artistNameBio)
+//                    .setMessage((String) result)
+//                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            // continue with delete
+//                        }
+//                    })
+//                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            // do nothing
+//                        }
+//                    })
+//                    .show();
+//        }
+//    }
+//    /* Checks if device is connected to the internet.
+//     * Returns true if connected to a WiFi network.
+//     */
+//    public boolean checkForConnection() {
+//        ConnectivityManager connectivityManager =
+//                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+//        return activeNetworkInfo != null;
+//    }
 }
