@@ -71,8 +71,10 @@ public class MusicListActivity extends AppCompatActivity {
                 //set now playing fragment
                 TextView mSongName = (TextView) findViewById(R.id.songName);
                 TextView mSongArtist = (TextView) findViewById(R.id.songArtist);
+                TextView mSongAlbum = (TextView) findViewById(R.id.songAlbum);
                 mSongName.setText(musicData.get(songIndex).getSongName());
                 mSongArtist.setText(musicData.get(songIndex).getSongArtist());
+                mSongAlbum.setText(musicData.get(songIndex).getSongAlbum());
             }
         };
         registerReceiver(reciever, filter);
