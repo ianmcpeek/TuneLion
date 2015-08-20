@@ -95,7 +95,7 @@ public class NowPlayingActivity extends AppCompatActivity {
                 mSongIndex = songService.getCurrentSongIndex();
 
                 // display metadata when new song appears
-                getMetadataForSong();
+                getMetadataForSong(intent.getExtras().getString("PATH"));
 
                 // display proper playcount
                 displayPlayCount();
@@ -103,6 +103,14 @@ public class NowPlayingActivity extends AppCompatActivity {
                 // sets correct seekbar
                 mSeekBar.setProgress(0);
                 mSeekBar.setMax(songService.getDuration());
+
+                if(songService.isPlaying()) {
+                    mPlayButton.setImageResource(R.drawable.pause_button);
+                    paused = false;
+                } else {
+                    mPlayButton.setImageResource(R.drawable.play_button);
+                    paused = true;
+                }
             }
         };
         registerReceiver(receiver, filter);
@@ -224,7 +232,9 @@ public class NowPlayingActivity extends AppCompatActivity {
         Log.d(TAG, "nextSong got called. songindex: " + mSongIndex + "\nsongPath: "
                 + songPath);
         mMetaRetriever.release();
-        songService.nextSong();
+        if(songService.nextSong()) {
+            mPlayButton.setImageResource(R.drawable.play_button);
+        }
     }
 
     public void shuffleSongs(View v) {
@@ -290,10 +300,10 @@ public class NowPlayingActivity extends AppCompatActivity {
     };
 
     //grabs song content to display for current song playing
-    private void getMetadataForSong() {
+    private void getMetadataForSong(String path) {
         mAlbumArt = (ImageView) findViewById(R.id.albumArt);
         mMetaRetriever = new MediaMetadataRetriever();
-        mMetaRetriever.setDataSource(songPath.get(mSongIndex));
+        mMetaRetriever.setDataSource(path);
         try {
             //grabbing same data twice, might just send data from activity instead
             art = mMetaRetriever.getEmbeddedPicture();

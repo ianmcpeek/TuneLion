@@ -213,12 +213,14 @@ public class SongQueueService extends Service {
 
     //manage song queue
     private ArrayList<String> songPathQueue;
+    private ArrayList<String> shuffleQueue;
     private int currentSongIndex;
 
     //controls for song player
     private boolean isPreviousPressed;
     private boolean isShuffle;
     private boolean isPlaying;
+    private boolean isPlaylistOver;
     private boolean loopSong;
     private boolean loopPlaylist;
 
@@ -236,6 +238,7 @@ public class SongQueueService extends Service {
         // --------- starts all fields as false ---------
         isPreviousPressed = false;
         isPlaying = false;
+        isPlaylistOver = false;
         isShuffle = false;
         loopPlaylist = false;
         loopSong = false;
@@ -246,8 +249,11 @@ public class SongQueueService extends Service {
             public void onCompletion(MediaPlayer mp) {
                 if (determineNextSong()) {
                     Log.d("OnCompletion", "current song index " + currentSongIndex + " out of " + songPathQueue.size());
-                    player.start();
+                    //player.start();
                     //player.release();
+                } else {
+                    player.stop();
+                    isPlaying = false;
                 }
             }
         });
@@ -280,7 +286,8 @@ public class SongQueueService extends Service {
     public void prepareSongQueue(ArrayList<String> songPathList, int startIndex) {
         songPathQueue = songPathList;
         currentSongIndex = startIndex;
-        prepareSong(currentSongIndex);
+        prepareSong(currentSongIndex, songPathQueue);
+        //if shuffle is enabled on this call, call createshuffle playlist first
     }
 
     /*
@@ -289,45 +296,51 @@ public class SongQueueService extends Service {
      * toggled.
      */
     private boolean determineNextSong() {
+        ArrayList<String> playlist;
         int indexStart = currentSongIndex;
+        //determine which playlist is being used
+        if(isShuffle) {
+            playlist = shuffleQueue;
+        } else {
+            playlist = songPathQueue;
+        }
+
         //check if loop song is pressed
         if(loopSong) {
             //don't change index, same one will be used to prepare song
-        } else if(isShuffle) {
-            currentSongIndex = (int)(Math.random()*songPathQueue.size());
         } else if(isPreviousPressed) {
             currentSongIndex = (currentSongIndex > 0) ? currentSongIndex - 1 : 0;
         //Otherwise when a song is completed or next is clicked, advance index forward
         } else {
             currentSongIndex =
-                    (currentSongIndex < songPathQueue.size() - 1)
-                            ? currentSongIndex + 1 : songPathQueue.size() - 1;
+                    (currentSongIndex < playlist.size() - 1)
+                            ? currentSongIndex + 1 : playlist.size() - 1;
         }
 
         //validate whether index is within bounds
-        if (!checkPlaylistOver(indexStart)) {
-            prepareSong(currentSongIndex);
+        if (!checkPlaylistOver(indexStart, playlist)) {
+            prepareSong(currentSongIndex, playlist);
             return true;
         } else {
             return false;
         }
     }
 
-    private boolean checkPlaylistOver(int indexStart) {
+    private boolean checkPlaylistOver(int indexStart, ArrayList<String> playlist) {
         boolean playlistOver = false;
         if (loopPlaylist) {
             //make sure songIndex is 0 and hasn't been set on this method call
             if (isPreviousPressed && currentSongIndex == 0
                     && currentSongIndex == indexStart) {
-                currentSongIndex = songPathQueue.size() - 1;
+                currentSongIndex = playlist.size()-1;
             //make sure songIndex is size-1 and hasn't been set on this method call
-            }else if (currentSongIndex == songPathQueue.size() - 1
+            }else if (currentSongIndex == playlist.size()-1
                     && currentSongIndex == indexStart) {
                 currentSongIndex = 0;
             }
         } else {
             //Check if song is either beginning or end of playlist, and index hasn't been set on this method call
-            if ((currentSongIndex == songPathQueue.size() - 1
+            if ((currentSongIndex == playlist.size()-1
                     || currentSongIndex == 0)
                     && currentSongIndex == indexStart) {
                 playlistOver = true;
@@ -342,10 +355,10 @@ public class SongQueueService extends Service {
      * @param index
      * @return returns true if song was successfully prepared.
      */
-    private boolean prepareSong(int index) {
+    private boolean prepareSong(int index, ArrayList<String> playlist) {
         player.reset();
         try {
-            player.setDataSource(songPathQueue.get(index));
+            player.setDataSource(playlist.get(index));
             player.prepare();
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -359,6 +372,7 @@ public class SongQueueService extends Service {
         }
         Intent i = new Intent("SONG_PREPARED");
         i.putExtra("INDEX", currentSongIndex);
+        i.putExtra("PATH", playlist.get(index));
         sendBroadcast(i);
         return true;
     }
@@ -382,12 +396,28 @@ public class SongQueueService extends Service {
     }
 
     public void previousSong() {
-        isPreviousPressed = true;
-        determineNextSong();
+        if(isPlaylistOver) {
+            prepareSong(currentSongIndex, isShuffle?shuffleQueue:songPathQueue);
+            isPlaylistOver = false;
+            return;
+        }
+        int length = player.getCurrentPosition();
+        if(length>3000) {
+            player.seekTo(0);
+        } else {
+            isPreviousPressed = true;
+            determineNextSong();
+        }
     }
 
-    public void nextSong() {
-        determineNextSong();
+    public boolean nextSong() {
+        isPlaying = true;
+        if(!determineNextSong()) {
+            player.stop();
+            isPlaying = false;
+            isPlaylistOver = true;
+        }
+        return isPlaylistOver;
     }
 
     public boolean isPlaying() {
@@ -410,11 +440,37 @@ public class SongQueueService extends Service {
         MULTI-FACED BUTTON CONTROLS
      ******************************/
 
+    private void createShuffledPlaylist() {
+        //copy all songs in playlist
+        ArrayList<String> cpy = new ArrayList<String>();
+        for(String songpath:songPathQueue) {
+            cpy.add(songpath);
+        }
+
+        //grab current index as beginning of shuffledPlaylist
+        shuffleQueue = new ArrayList<String>();
+        shuffleQueue.add(cpy.get(currentSongIndex));
+        cpy.remove(currentSongIndex);
+        while(cpy.size()>0) {
+            int rndm = (int)(Math.random()*cpy.size());
+            shuffleQueue.add(cpy.get(rndm));
+            cpy.remove(rndm);
+        }
+        //set index to beginning of shuffledPlaylist
+        currentSongIndex = 0;
+    }
+
+    private void resetSongIndex() {
+        currentSongIndex = songPathQueue.indexOf(shuffleQueue.get(currentSongIndex));
+    }
+
     public boolean toggleShuffle() {
         if (isShuffle) {
             isShuffle = false;
+            resetSongIndex();
         } else {
             isShuffle = true;
+            createShuffledPlaylist();
         }
         return isShuffle;
     }
