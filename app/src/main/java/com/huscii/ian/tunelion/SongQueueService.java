@@ -480,6 +480,9 @@ public class SongQueueService extends Service {
         }
         return isShuffle;
     }
+    public boolean isShuffled() {
+        return isShuffle;
+    }
 
     public int toggleRepeat() {
         if (!loopSong && !loopPlaylist) {
@@ -493,6 +496,16 @@ public class SongQueueService extends Service {
             loopPlaylist = false;
             loopSong = false;
             return 3;
+        }
+    }
+
+    public int getRepeatState() {
+        if (!loopSong && !loopPlaylist) {
+            return 3;
+        } else if(loopPlaylist && !loopSong) {
+            return 1;
+        } else {
+            return 2;
         }
     }
 }

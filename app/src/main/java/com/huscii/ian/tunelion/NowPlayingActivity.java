@@ -214,6 +214,26 @@ public class NowPlayingActivity extends AppCompatActivity {
                 } else {
                     mPlayButton.setImageResource(R.drawable.play_button);
                 }
+
+                if(songService.isShuffled()) {
+                    mShuffleButton.setImageResource(R.drawable.shuffle_on_button);
+                } else {
+                    mShuffleButton.setImageResource(R.drawable.shuffle_off_button);
+                }
+
+                switch(songService.getRepeatState()) {
+                    case 1:
+                        mRepeatButton.setImageResource(R.drawable.repeat_all_button);
+                        break;
+                    //loop song
+                    case 2:
+                        mRepeatButton.setImageResource(R.drawable.repeat_one_button);
+                        break;
+                    //off
+                    case 3:
+                        mRepeatButton.setImageResource(R.drawable.repeat_off_button);
+                        break;
+                }
             }
         };
         registerReceiver(receiver, filter);
