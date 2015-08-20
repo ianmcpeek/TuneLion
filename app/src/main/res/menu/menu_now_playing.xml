@@ -3,8 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.huscii.ian.tunelion.NowPlayingActivity">
 
-    <item android:id="@+id/lastfm_artist_info"
+    <item android:id="@+id/lastfmArtistInfo"
         android:title="Last.FM Artist Info"
         android:orderInCategory="100"
         app:showAsAction="never" />
+
+    <item android:id="@+id/themeChanger"
+        android:title="Change Theme"
+        android:orderInCategory="200"
+        android:showAsAction="never"/>
 </menu>

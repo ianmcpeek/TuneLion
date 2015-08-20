@@ -138,8 +138,27 @@ public class NowPlayingActivity extends AppCompatActivity {
         String[] strings = artistNameBio.split(" ");
         String finalString = "";
 
+        if (id == R.id.themeChanger) {
+            new AlertDialog.Builder(NowPlayingActivity.this)
+                    .setTitle("Change your theme!")
+                    .setMessage("Which color do you like best?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // select the color and change layouts color here
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing (cancels basically)
+                        }
+                    })
+                    .show();
+
+            return super.onOptionsItemSelected(item);
+        }
+
         //noinspection SimplifiableIfStatement
-        if (id == R.id.lastfm_artist_info) {
+        if (id == R.id.lastfmArtistInfo) {
             //lastFMTask.execute();
             for (int i = 0; i < strings.length; i++) {
                 if (i == 0) finalString += strings[i];
