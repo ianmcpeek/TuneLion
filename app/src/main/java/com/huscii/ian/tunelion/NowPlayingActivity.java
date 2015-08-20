@@ -161,7 +161,7 @@ public class NowPlayingActivity extends AppCompatActivity {
 
         if (id == R.id.themeChanger) {
             new AlertDialog.Builder(NowPlayingActivity.this)
-                    .setTitle("I don't like my color anymore")
+                    .setTitle("Change me please (・ω・)")
                     .setItems(colors, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int color) {
@@ -199,7 +199,7 @@ public class NowPlayingActivity extends AppCompatActivity {
                             }
                         }
                     })
-                    .setPositiveButton("I changed my mind...", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("I changed my mind ಠ_ಠ", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // lolz
                         }
