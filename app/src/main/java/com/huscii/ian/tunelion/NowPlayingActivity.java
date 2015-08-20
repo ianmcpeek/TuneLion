@@ -1,7 +1,7 @@
 package com.huscii.ian.tunelion;
 
-import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -27,13 +27,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import de.umass.lastfm.Artist;
 import de.umass.lastfm.Caller;
-import de.umass.lastfm.Track;
 
 
 public class NowPlayingActivity extends AppCompatActivity {
@@ -70,7 +68,7 @@ public class NowPlayingActivity extends AppCompatActivity {
     // --------------
 
     // Vars for Last.FM
-    private String lastfmAristName;
+    private String artistNameBio;
 
     private final String TAG = "NowPlayingActivity";
 
@@ -136,14 +134,28 @@ public class NowPlayingActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        LastFMTask lastFMTask = new LastFMTask();
+        //LastFMTask lastFMTask = new LastFMTask();
+        String[] strings = artistNameBio.split(" ");
+        String finalString = "";
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.lastfm_artist_info) {
-            lastFMTask.execute();
+            //lastFMTask.execute();
+            for (int i = 0; i < strings.length; i++) {
+                if (i == 0) finalString += strings[i];
+                else finalString += "+" + strings[i];
+            }
+            Log.d(TAG, "finalString == " + finalString);
+            goToUrl("http://www.last.fm/music/" + finalString);
+//            LastFMTask lastFMTask = new LastFMTask();
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    private void goToUrl (String url) {
+        Uri uriUrl = Uri.parse(url);
+        Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+        startActivity(launchBrowser);
     }
 
     public void initViews() {
@@ -353,7 +365,7 @@ public class NowPlayingActivity extends AppCompatActivity {
             mTitleName.setText
                     (mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
             // Set artist name for Last.FM
-            lastfmAristName =
+            artistNameBio =
                     mMetaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
         } catch (Exception e) {
             mAlbumArt.setImageResource(R.drawable.tunelion_logo);
@@ -394,14 +406,14 @@ public class NowPlayingActivity extends AppCompatActivity {
             Caller.getInstance().setUserAgent("tst");
             String key = "c22dfba18c4c23bd20cfb6cd2caad7c1";
             String secret = "21d5ce8e8f31cfd0ba3fcc49d6226d18";
-            Artist artist = Artist.getInfo(lastfmAristName, key);
+            Artist artist = Artist.getInfo(artistNameBio, key);
             return artist.getWikiSummary();
         }
 
         @Override
         protected void onPostExecute(Object result) {
             new AlertDialog.Builder(NowPlayingActivity.this)
-                    .setTitle(lastfmAristName)
+                    .setTitle(artistNameBio)
                     .setMessage((String) result)
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
