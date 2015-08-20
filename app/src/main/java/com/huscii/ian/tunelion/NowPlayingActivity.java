@@ -138,12 +138,11 @@ public class NowPlayingActivity extends AppCompatActivity {
        prepareSongPreparedReciever();
 
         //check whether connected to internet
-//        if(checkForConnection()) {
-//            new LastFMTask().execute();
-//            Toast.makeText(getApplicationContext(), "Grabbing album name from last.fm", Toast.LENGTH_SHORT).show();
-//        } else {
-//            Toast.makeText(getApplicationContext(), "Not connected to the internet", Toast.LENGTH_SHORT).show();
-//        }
+        if(checkForConnection()) {
+            Toast.makeText(getApplicationContext(), "(((o(*ﾟ▽ﾟ*)o)))", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "ಠ╭╮ಠ", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -550,13 +549,14 @@ public class NowPlayingActivity extends AppCompatActivity {
 //                    .show();
 //        }
 //    }
-//    /* Checks if device is connected to the internet.
-//     * Returns true if connected to a WiFi network.
-//     */
-//    public boolean checkForConnection() {
-//        ConnectivityManager connectivityManager =
-//                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-//        return activeNetworkInfo != null;
-//    }
+
+    /* Checks if device is connected to the internet.
+     * Returns true if connected to a WiFi network.
+     */
+    public boolean checkForConnection() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
+    }
 }
