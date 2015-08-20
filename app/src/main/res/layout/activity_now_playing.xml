@@ -9,14 +9,14 @@
         android:id="@+id/songMetadataBackground"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/mint_green"/>
+        android:background="@color/one_day_explosion"/>
 
     <ImageView
         android:id="@+id/buttonBackground"
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_height="90dp"
-        android:background="@color/mint_green"/>
+        android:background="@color/one_day_explosion"/>
 
     <TextView
         android:id="@+id/playCountText"

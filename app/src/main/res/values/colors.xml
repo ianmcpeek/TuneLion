@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="mint_green">#00C176</color>
+    <!-- Colors are from http://www.colourlovers.com/palette/56122/Sweet_Lolly -->
+    <color name="sofft_reddy_pink">#FF003C</color>
+    <color name="holland">#FF8A00</color>
+    <color name="over_easy_please">#FABE28</color>
+    <color name="bug_leg">#88C100</color>
+    <color name="one_day_explosion">#00C176</color>
+
     <color name="white">#FFFFFF</color>
     <color name="yellow_orange">#FABE28</color>
 </resources>

@@ -1,6 +1,7 @@
 package com.huscii.ian.tunelion;
 
 import android.content.DialogInterface;
+import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.content.BroadcastReceiver;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -135,21 +137,71 @@ public class NowPlayingActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //LastFMTask lastFMTask = new LastFMTask();
+        /**
+         * This is for grabbing the write artist info to
+         * open within the browser
+         */
         String[] strings = artistNameBio.split(" ");
         String finalString = "";
 
+        /**
+         * This is for changing the theme of the NowPlayingActivity
+         * and MusicListActivity
+         */
+        CharSequence colors[] = new CharSequence[] {
+                "sofft reddy pink",
+                "holland",
+                "over easy, please",
+                "bug leg",
+                "one day explosion"
+        };
+        final ImageView mButtonBackground = (ImageView) findViewById(R.id.buttonBackground);
+        final ImageView mSongMetadataBackground =
+                (ImageView) findViewById(R.id.songMetadataBackground);
+
         if (id == R.id.themeChanger) {
             new AlertDialog.Builder(NowPlayingActivity.this)
-                    .setTitle("Change your theme!")
-                    .setMessage("Which color do you like best?")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // select the color and change layouts color here
+                    .setTitle("I don't like my color anymore")
+                    .setItems(colors, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int color) {
+                            switch (color) {
+                                case 0:
+                                    mButtonBackground
+                                            .setBackgroundResource(R.color.sofft_reddy_pink);
+                                    mSongMetadataBackground
+                                            .setBackgroundResource(R.color.sofft_reddy_pink);
+                                    break;
+                                case 1:
+                                    mButtonBackground
+                                            .setBackgroundResource(R.color.holland);
+                                    mSongMetadataBackground
+                                            .setBackgroundResource(R.color.holland);
+                                    break;
+                                case 2:
+                                    mButtonBackground
+                                            .setBackgroundResource(R.color.over_easy_please);
+                                    mSongMetadataBackground
+                                            .setBackgroundResource(R.color.over_easy_please);
+                                    break;
+                                case 3:
+                                    mButtonBackground
+                                            .setBackgroundResource(R.color.bug_leg);
+                                    mSongMetadataBackground
+                                            .setBackgroundResource(R.color.bug_leg);
+                                    break;
+                                case 4:
+                                    mButtonBackground
+                                            .setBackgroundResource(R.color.one_day_explosion);
+                                    mSongMetadataBackground
+                                            .setBackgroundResource(R.color.one_day_explosion);
+                                    break;
+                            }
                         }
                     })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    .setPositiveButton("I changed my mind...", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            // do nothing (cancels basically)
+                            // lolz
                         }
                     })
                     .show();
