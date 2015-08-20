@@ -15,6 +15,26 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Playlists"
+        android:id="@+id/playlistListTitle"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="50dp"
+        android:layout_toRightOf="@id/songListTitle"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Albums"
+        android:id="@+id/albumListTitle"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="50dp"
+        android:layout_toLeftOf="@id/songListTitle"/>
+
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -53,27 +73,5 @@
         android:layout_marginLeft="20dp"
         android:textColor="@color/white"
         android:textStyle="italic"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Playlists"
-        android:id="@+id/textView"
-        android:layout_marginRight="48dp"
-        android:layout_marginEnd="48dp"
-        android:layout_above="@+id/songList"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Albums"
-        android:id="@+id/textView2"
-        android:layout_above="@+id/songList"
-        android:layout_alignRight="@+id/songName"
-        android:layout_alignEnd="@+id/songName" />
 
 </RelativeLayout>

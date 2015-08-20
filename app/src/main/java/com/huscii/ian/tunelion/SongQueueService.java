@@ -319,15 +319,15 @@ public class SongQueueService extends Service {
             //make sure songIndex is 0 and hasn't been set on this method call
             if (isPreviousPressed && currentSongIndex == 0
                     && currentSongIndex == indexStart) {
-                currentSongIndex = songPathQueue.size();
+                currentSongIndex = songPathQueue.size() - 1;
             //make sure songIndex is size-1 and hasn't been set on this method call
-            }else if (currentSongIndex == songPathQueue.size()
+            }else if (currentSongIndex == songPathQueue.size() - 1
                     && currentSongIndex == indexStart) {
                 currentSongIndex = 0;
             }
         } else {
             //Check if song is either beginning or end of playlist, and index hasn't been set on this method call
-            if ((currentSongIndex == songPathQueue.size()
+            if ((currentSongIndex == songPathQueue.size() - 1
                     || currentSongIndex == 0)
                     && currentSongIndex == indexStart) {
                 playlistOver = true;

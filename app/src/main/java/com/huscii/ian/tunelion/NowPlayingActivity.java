@@ -181,8 +181,8 @@ public class NowPlayingActivity extends AppCompatActivity {
                 // for skipping through the song when holding skip bar
                 if (fromUser) songService.seekTo(progress);
 
-                // 1 == .001 seconds
-                if (progress >= songService.getDuration() - 1) {
+                // 1000 == 1 seconds
+                if (progress >= songService.getDuration() - 1000) {
                     updatePlayCount();
                 }
             }

@@ -36,7 +36,7 @@ public class MusicListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
-        musicData = new ArrayList<SongData>();
+        musicData = new ArrayList<>();
 
         ListView mSongList = (ListView) findViewById(R.id.songList);
         SongCursorAdapter adapter = new SongCursorAdapter(this, getCursor(), 0);
@@ -123,48 +123,48 @@ public class MusicListActivity extends AppCompatActivity {
         return cursor;
     }
 
-    public void getMusicData() {
-        musicData = new ArrayList<SongData>();
+//    public void getMusicData() {
+//        musicData = new ArrayList<SongData>();
+//
+//        //retrieve existing music on phone
+//        String[] projection = {
+//                //MediaStore.Audio.Media.CONTENT_TYPE,
+//                MediaStore.Audio.Media._ID,
+//                MediaStore.Audio.Media.ARTIST,
+//                MediaStore.Audio.Media.TITLE,
+//                MediaStore.Audio.Media.DATA,
+//                MediaStore.Audio.Media.DISPLAY_NAME,
+//                MediaStore.Audio.Media.DURATION,
+//                MediaStore.Audio.Media.ALBUM,
+//                MediaStore.Audio.Media.YEAR
+//        };
+//        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
+//        Cursor cursor = getContentResolver().query(
+//                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//                projection,
+//                selection,
+//                null,
+//                null);
+//        cursor.moveToFirst();
+//        while(!cursor.isAfterLast()) {
+//            String song = cursor.getString(cursor.getColumnIndex("TITLE"));
+//            String artist = cursor.getString(cursor.getColumnIndex("ARTIST"));
+//            String album = cursor.getString(cursor.getColumnIndex("ALBUM"));
+//            int duration = cursor.getInt(cursor.getColumnIndex("DURATION"));
+//            //Used to change song
+//            String dataSource = cursor.getString(3);
+//
+//            musicData.add(new SongData(song, artist, album, dataSource));
+//        }
+//    }
 
-        //retrieve existing music on phone
-        String[] projection = {
-                //MediaStore.Audio.Media.CONTENT_TYPE,
-                MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.DISPLAY_NAME,
-                MediaStore.Audio.Media.DURATION,
-                MediaStore.Audio.Media.ALBUM,
-                MediaStore.Audio.Media.YEAR
-        };
-        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
-        Cursor cursor = getContentResolver().query(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                selection,
-                null,
-                null);
-        cursor.moveToFirst();
-        while(!cursor.isAfterLast()) {
-            String song = cursor.getString(cursor.getColumnIndex("TITLE"));
-            String artist = cursor.getString(cursor.getColumnIndex("ARTIST"));
-            String album = cursor.getString(cursor.getColumnIndex("ALBUM"));
-            int duration = cursor.getInt(cursor.getColumnIndex("DURATION"));
-            //Used to change song
-            String dataSource = cursor.getString(3);
-
-            musicData.add(new SongData(song, artist, album, dataSource));
-        }
-    }
-
-    public ArrayList<String> getSongs() {
-        ArrayList<String> songs = new ArrayList<String>();
-        for(SongData song:musicData) {
-            songs.add(song.getSongName());
-        }
-        return songs;
-    }
+//    public ArrayList<String> getSongs() {
+//        ArrayList<String> songs = new ArrayList<String>();
+//        for(SongData song:musicData) {
+//            songs.add(song.getSongName());
+//        }
+//        return songs;
+//    }
 
     public ArrayList<String> getSongPaths() {
         ArrayList<String> songs = new ArrayList<String>();
@@ -174,17 +174,17 @@ public class MusicListActivity extends AppCompatActivity {
         return songs;
     }
 
-    public void continueNowPlaying(View v) {
-        //still broken, need to fix now playing onCreate
-        Intent nowPlaying = new Intent(MusicListActivity.this, NowPlayingActivity.class);
-        nowPlaying.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivity(nowPlaying);
-    }
+//    public void continueNowPlaying(View v) {
+//        //still broken, need to fix now playing onCreate
+//        Intent nowPlaying = new Intent(MusicListActivity.this, NowPlayingActivity.class);
+//        nowPlaying.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//        startActivity(nowPlaying);
+//    }
 
     public class SongCursorAdapter extends CursorAdapter {
 
         public SongCursorAdapter(Context context, Cursor c, int flags) {
-            super(context, c, 0);
+            super(context, c, flags);
         }
 
         @Override
