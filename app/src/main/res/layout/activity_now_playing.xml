@@ -15,7 +15,7 @@
         android:id="@+id/buttonBackground"
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
-        android:layout_height="75dp"
+        android:layout_height="100dp"
         android:background="@color/mint_green"/>
 
     <TextView
@@ -72,15 +72,15 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/tunelion_logo"
-        android:layout_above="@+id/seekBar"
+        android:layout_above="@+id/buttonBackground"
         android:layout_below="@+id/songMetadataBackground"/>
 
     <SeekBar
         android:id="@+id/seekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
         android:layout_above="@+id/playButton"
+        android:thumb="@drawable/seekbar_thumb"
         android:layout_centerHorizontal="true"/>
 
     <ImageView
