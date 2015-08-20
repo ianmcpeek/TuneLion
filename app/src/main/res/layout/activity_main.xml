@@ -8,7 +8,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="center"
+        android:scaleType="centerCrop"
         android:id="@+id/imgBackground"/>
 
     <ImageView
@@ -40,44 +40,5 @@
         android:layout_centerInParent="true"
         android:clickable="true"
         android:layout_marginTop="5dp"/>
-
-    <!--<RadioGroup-->
-        <!--android:id="@+id/radioGroup"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:orientation="horizontal">-->
-
-        <!--<RadioButton-->
-            <!--android:id="@+id/rdo_gold"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:checked="true"-->
-            <!--android:playSong="onRadioClicked"-->
-            <!--android:text="Gold"/>-->
-
-        <!--<RadioButton-->
-            <!--android:id="@+id/rdo_red"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:playSong="onRadioClicked"-->
-            <!--android:text="Red"/>-->
-
-        <!--<RadioButton-->
-            <!--android:id="@+id/rdo_blue"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:playSong="onRadioClicked"-->
-            <!--android:text="Blue"/>-->
-    <!--</RadioGroup>-->
-
-    <!--<TextView-->
-        <!--android:id="@+id/textView"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_above="@+id/radioGroup"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:text="Set Background Color"/>-->
 
 </RelativeLayout>

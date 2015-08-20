@@ -31,6 +31,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Albums"
         android:id="@+id/albumListTitle"
+        android:clickable="true"
         android:layout_marginTop="15dp"
         android:layout_marginRight="50dp"
         android:layout_toLeftOf="@id/songListTitle"/>

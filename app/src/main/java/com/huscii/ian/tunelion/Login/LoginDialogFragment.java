@@ -78,7 +78,7 @@ public class LoginDialogFragment extends DialogFragment {
                 String pwd = pwdText.getText().toString();
                 Log.d(TAG, ": " + email + "//" + pwd);
                 if (email.length() != 0 && pwd.length() != 0) {
-                    String url = "http://cssgate.insttech.washington.edu/~jalecomp/TuneLion/newUsers.php?email=";
+                    String url = "http://cssgate.insttech.washington.edu/~jalecomp/TuneLion/ianUsers.php?email=";
                     url += email + "&password=" + pwd;
                     Log.d(TAG, url);
                     new ConfirmUserWebTask().execute(url);

@@ -23,6 +23,8 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
 //needs to register a simpleongesturelistener for fling
@@ -32,6 +34,10 @@ public class MusicListActivity extends AppCompatActivity {
 
     private ArrayList<SongData> musicData;
 
+//    private boolean sortSongListByAlbumName = true;
+
+    private final String TAG = "MusicListActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +45,7 @@ public class MusicListActivity extends AppCompatActivity {
         musicData = new ArrayList<>();
 
         ListView mSongList = (ListView) findViewById(R.id.songList);
-        SongCursorAdapter adapter = new SongCursorAdapter(this, getCursor(), 0);
+        final SongCursorAdapter adapter = new SongCursorAdapter(this, getCursor(), 0);
         mSongList.setAdapter(adapter);
         mSongList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -70,6 +76,16 @@ public class MusicListActivity extends AppCompatActivity {
             }
         };
         registerReceiver(reciever, filter);
+
+//        // clicking songs/albums/playlists will switch
+//        final TextView albumListTextView = (TextView) this.findViewById(R.id.albumListTitle);
+//        albumListTextView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d(TAG, "I was pressed");
+//                sortSongListByAlbumName = true;
+//            }
+//        });
 
         //Used to change contents within list bro
         //adapter.changeCursor(newCursor);
@@ -167,8 +183,8 @@ public class MusicListActivity extends AppCompatActivity {
 //    }
 
     public ArrayList<String> getSongPaths() {
-        ArrayList<String> songs = new ArrayList<String>();
-        for(SongData song:musicData) {
+        ArrayList<String> songs = new ArrayList<>();
+        for (SongData song : musicData) {
             songs.add(song.getSongPath());
         }
         return songs;
@@ -181,8 +197,7 @@ public class MusicListActivity extends AppCompatActivity {
 //        startActivity(nowPlaying);
 //    }
 
-    public class SongCursorAdapter extends CursorAdapter {
-
+    private class SongCursorAdapter extends CursorAdapter {
         public SongCursorAdapter(Context context, Cursor c, int flags) {
             super(context, c, flags);
         }
@@ -210,15 +225,25 @@ public class MusicListActivity extends AppCompatActivity {
 
             SongData songData = new SongData(song, artist, album, dataSource);
             boolean exists = false;
-            for(SongData sData :musicData) {
-                if(sData.equals(songData)) {
+            for (SongData sData : musicData) {
+                if (sData.equals(songData)) {
                     Log.d("SongPathQueue", "Song found " + song);
                     exists = true;
                     break;
                 }
             }
-            if(!exists) {
+            if (!exists) {
                 musicData.add(songData);
+//                if (!sortSongListByAlbumName) {
+//                    Collections.sort(musicData, new Comparator<SongData>() {
+//                        public int compare(SongData s1, SongData s2) {
+//                            Log.d(TAG, "We made it: " + s1.getSongAlbum().toLowerCase() + " compared to "
+//                                    .compareTo(s2.getSongAlbum().toLowerCase()));
+//                            return s1.getSongAlbum().toLowerCase()
+//                                    .compareTo(s2.getSongAlbum().toLowerCase());
+//                        }
+//                    });
+//                }
                 Log.d("SongPathQueue", "Added song " + song + " size: " + musicData.size());
             }
 
@@ -231,9 +256,6 @@ public class MusicListActivity extends AppCompatActivity {
                     TimeUnit.MILLISECONDS.toSeconds(duration) -
                             TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))));
             txtPath.setText(dataSource);
-
         }
-
-
     }
 }
