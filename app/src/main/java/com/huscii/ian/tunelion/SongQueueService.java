@@ -203,29 +203,55 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
+ * This service is used to play songs from a playlist throughout the phone.
+ * Activities are notified on song changes.
  * Created by ian on 24/07/15.
  */
-
-//BROADCAST when new song is played
 public class SongQueueService extends Service {
+
+    /* Used to bind service */
     private final IBinder mBinder = new LocalBinder();
+    /* Performs all actions related to a song */
     private MediaPlayer player;
 
     //manage song queue
+    /* Stores the sequential ordering of all song data sources in a playlist */
     private ArrayList<String> songPathQueue;
+    /* Stores the shuffled ordering of all song data sources in a playlist */
     private ArrayList<String> shuffleQueue;
+    /* Stores the current position in a playlist */
     private int currentSongIndex;
 
     //controls for song player
+    /* Determines whether the previous button was pressed */
     private boolean isPreviousPressed;
+    /* Determines whether playlist is shuffled */
     private boolean isShuffle;
+    /* Determines whether a song is currently playing */
     private boolean isPlaying;
+    /* Determines whether the playlist has ended */
     private boolean isPlaylistOver;
+    /* Determines whether one song in a playlist is looping */
     private boolean loopSong;
+    /* Determines whether all songs in a playlist are looping */
     private boolean loopPlaylist;
 
-    private final String TAG = "SongQueueService";
+    //bind service boilerplate code
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
 
+    public class LocalBinder extends Binder {
+        public SongQueueService getServiceInstance(){
+            return SongQueueService.this;
+        }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
+    }
     @Override
     public void onCreate() {
         super.onCreate();
@@ -263,24 +289,13 @@ public class SongQueueService extends Service {
         player.release();
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
-
-    public class LocalBinder extends Binder {
-        public SongQueueService getServiceInstance(){
-            return SongQueueService.this;
-        }
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    /*
-     * Called by an activity to pass in a song queue to be played by the player
+    /**
+     * Sets the Song Queue with a playlist passed in from the Now Playing Activity. Alternatively
+     * fires a "SONG_PREPARED" broadcast to immediately set the controls to match data onResume of
+     * Now Playing Activity.
+     * @param songPathList list of all song data paths for a playlist
+     * @param startIndex position in playlist to start off with
+     * @param isResumed flag to determine whether nowPlaying was being created or resumed
      */
     public void prepareSongQueue(ArrayList<String> songPathList, int startIndex, boolean isResumed) {
         if(isResumed) {
@@ -291,15 +306,17 @@ public class SongQueueService extends Service {
         } else {
             songPathQueue = songPathList;
             currentSongIndex = startIndex;
+            //if shuffle is enabled on this call, call createshuffle playlist first
+            createShuffledPlaylist();
             prepareSong(currentSongIndex, songPathQueue);
         }
-        //if shuffle is enabled on this call, call createshuffle playlist first
     }
 
-    /*
+    /**
      * Whether a song is completed, or the user presses the skip or previous button this is called
      * to determine which song to play next in the playlist depending on which options are currently
      * toggled.
+     * @return whether another song is playing
      */
     private boolean determineNextSong() {
         ArrayList<String> playlist;
@@ -332,6 +349,12 @@ public class SongQueueService extends Service {
         }
     }
 
+    /**
+     * Determines whether playlist is over and resets playlist when appropiate.
+     * @param indexStart index used to check whether value was changed on this call
+     * @param playlist playlist currently in use of the player
+     * @return whether playlist is over
+     */
     private boolean checkPlaylistOver(int indexStart, ArrayList<String> playlist) {
         boolean playlistOver = false;
         if (loopPlaylist) {
@@ -358,7 +381,7 @@ public class SongQueueService extends Service {
 
     /**
      * After the appropiate song index has been chosen, this method prepares which song to play.
-     * @param index
+     * @param index position to play song from
      * @return returns true if song was successfully prepared.
      */
     private boolean prepareSong(int index, ArrayList<String> playlist) {
@@ -376,6 +399,8 @@ public class SongQueueService extends Service {
             e.printStackTrace();
             return false;
         }
+
+        //send out broadcast to notify user controls of change
         Intent i = new Intent("SONG_PREPARED");
         i.putExtra("INDEX", currentSongIndex);
         i.putExtra("PATH", playlist.get(index));
@@ -383,6 +408,10 @@ public class SongQueueService extends Service {
         return true;
     }
 
+    /**
+     * Returns current song position in playlist.
+     * @return song position
+     */
     public int getCurrentSongIndex() {
         return currentSongIndex;
     }
@@ -391,16 +420,25 @@ public class SongQueueService extends Service {
         PLAYER CONTROLS
      *******************/
 
+    /**
+     * Plays a song.
+     */
     public void playSong() {
         isPlaying = true;
         player.start();
     }
 
+    /**
+     * Pauses a song.
+     */
     public void pauseSong() {
         isPlaying = false;
         player.pause();
     }
 
+    /**
+     * Jumps to beginning of song or previous song.
+     */
     public void previousSong() {
         if(isPlaylistOver) {
             prepareSong(currentSongIndex, isShuffle?shuffleQueue:songPathQueue);
@@ -416,6 +454,10 @@ public class SongQueueService extends Service {
         }
     }
 
+    /**
+     * Jumps to next song or ends playlist.
+     * @return whether playlist is over.
+     */
     public boolean nextSong() {
         isPlaying = true;
         if(!determineNextSong()) {
